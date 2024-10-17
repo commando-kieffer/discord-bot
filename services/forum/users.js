@@ -1,4 +1,4 @@
-import mysql from "mysql"
+import mysql from "mysql2"
 
 const setRoles = (discordId, nom, main, secondary) => {
 	const connection = mysql.createConnection({

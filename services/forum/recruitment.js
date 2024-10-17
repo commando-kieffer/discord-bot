@@ -1,5 +1,5 @@
 import axios from 'axios'
-import mysql from 'mysql'
+import mysql from 'mysql2'
 import qs from 'qs'
 import { Fields } from '../../recruitment-forms.js'
 
