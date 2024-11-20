@@ -471,7 +471,7 @@ export const displaySpe = () => {
 	const message = `
 # __La spé fusilier__ (_FSL_)
     
-### __Arme Principale :__
+## __Arme Principale :__
 Tous les Fusils d'assaut.
 **__Accessoire :__**
 - Lunette au-dessus de x3 interdite entre CK ; au delà autorisée en public.
@@ -479,27 +479,27 @@ Tous les Fusils d'assaut.
 - Aucun lance grenade.
 - Lance grenade fumigène autorisé.
 
-### __Arme Secondaire :__
+## __Arme Secondaire :__
 Toutes les armes de poings autorisées, __excepté les automatiques__ (GREKHOVA). Aucun lanceur d'engins explosifs (Ex : Javelin)
 **__Accessoire :__**
 - Lunette x1 seulement.
 
-### __Tactique :__
+## __Tactique :__
 - Autorisé : Grenade paralysante, grenade flash, fumigène, alarme de proximité, stimulant, leurre et charge electrique.
 - Interdit : Caméra espion.
 
-### __Mortel :__
+## __Mortel :__
 - Autorisé : Grenade à fragmentation, bombe collante, grenade thermobarique, grenade d'impact, cocktail molotov et hache de combat.
 - Interdit : Tout le reste.
 
-### __Amélioration de combat :__
+## __Amélioration de combat :__
 - Autorisé : Systeme trophy, signal leurre, insertion tactique (si autorisée pour le scénario), amplificateur acoustique, gaz neurotoxique et agent dormant.
 - Interdit : Tout le reste.
 
-### __Atout :__
+## __Atout :__
 Tous autorisés.
 
-### __Jokers :__
+## __Jokers :__
 - Interdit : Surarmement.
 - Autorisé : Tout le reste.
 
