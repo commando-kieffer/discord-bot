@@ -460,7 +460,7 @@ L'histoire : https://commandokieffer.com/history.php
 La galerie : https://commandokieffer.com/galerie.php
 
 **__Les ressources intéressantes__**
-Spé arme CoD MW III : https://forum.commandokieffer.com/index.php?threads/mwiii-sp%C3%A9cialit%C3%A9-arme.3115/
+Spé arme CoD BO6 : https://forum.commandokieffer.com/index.php?threads/bo6-sp%C3%A9cialit%C3%A9-arme.3406/
 Explication des grades : https://forum.commandokieffer.com/index.php?threads/grades-du-commando-kieffer.18/
 `
 
@@ -471,46 +471,41 @@ export const displaySpe = () => {
 	const message = `
 # __La spé fusilier__ (_FSL_)
     
-**__Arme Principale :__** Seulement et tous les Fusils d'assaut.
-Receveur : Garder le receveur de base de la classe. Aucune modification autorisée.
-Accessoire :
-- Lunette entre x1.0 et x4.8 comprise. Au delà autorisé en public.
-- Lunette thermique interdite entre CK. Mais autorisée en public.
-- Aucun lance grenade autorisé. Fusil à pompe sous l'arme autorisé.
+### __Arme Principale :__
+Tous les Fusils d'assaut.
+**__Accessoire :__**
+- Lunette au-dessus de x3 interdite entre CK ; au delà autorisée en public.
+- Lunette thermique interdite entre CK mais autorisée en public.
+- Aucun lance grenade.
+- Lance grenade fumigène autorisé.
 
-**__Arme Secondaire :__**
-Toutes les armes de poings autorisées, exceptées les full-automatiques.
-
+### __Arme Secondaire :__
+Toutes les armes de poings autorisées, __excepté les automatiques__ (GREKHOVA). Aucun lanceur d'engins explosifs (Ex : Javelin)
 **__Accessoire :__**
 - Lunette x1 seulement.
 
-**__Tactique :__**
-- Autorisé : Rage de combat, Grenade fumigene, Grenade leurre, Grenade flash, Charge élétrique, Stimulant, Lacrymogene et Paralysante.
-- Non Autorisé : Tout le reste.
+### __Tactique :__
+- Autorisé : Grenade paralysante, grenade flash, fumigène, alarme de proximité, stimulant, leurre et charge electrique.
+- Interdit : Caméra espion.
 
-**__Mortel :__**
-- Autorisé : Grenade Frag, couteau lancer, thermite, thermobarique, semtex et shuriken.
-- Non Autorisé : Tout le reste.
+### __Mortel :__
+- Autorisé : Grenade à fragmentation, bombe collante, grenade thermobarique, grenade d'impact, cocktail molotov et hache de combat.
+- Interdit : Tout le reste.
 
-**__Amélioration de combat :__**
-- Autorisé : Système Trophy, Boite de soins, Leurre, Bouclier Balistique, DDOS, Silence de mort, Radar Portatif, Boite de Munition.
-- Non Autorisé : Tout le reste.
+### __Amélioration de combat :__
+- Autorisé : Systeme trophy, signal leurre, insertion tactique (si autorisée pour le scénario), amplificateur acoustique, gaz neurotoxique et agent dormant.
+- Interdit : Tout le reste.
 
-**__Les gilets :__**
-- Autorisé : Gilet d'infanterie, d'ingénieur, démolition, contrôle de communications, surarmement (avec arme de poing en secondaire)
-- Non Autorisé : Tout le reste.
+### __Atout :__
+Tous autorisés.
 
-**__Gants :__**
-Tout.
+### __Jokers :__
+- Interdit : Surarmement.
+- Autorisé : Tout le reste.
 
-**__Bottes :__**
-Tout.
-
-**__Equipement :__**
-Tout sauf système de détection de menace.
-
-# __Les autres spé__
-A ce lien : https://forum.commandokieffer.com/index.php?threads/mwiii-sp%C3%A9cialit%C3%A9-arme.3115/
+# __Les autres spé BO6__
+- CoD BO6 : https://forum.commandokieffer.com/index.php?threads/bo6-sp%C3%A9cialit%C3%A9-arme.3406/
+- CoD: UO & CoD II : https://forum.commandokieffer.com/index.php?threads/sp%C3%A9cialisation-armes-cod-uo-et-cod-ii.2252/
 `
 	return Promise.resolve({ status: 200, message })
 }
