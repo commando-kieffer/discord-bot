@@ -234,7 +234,7 @@ const buildMessage = ({
 	skills_design,
 	skills_video
 }) =>
-	`[HEADING=2][u]QUESTIONNAIRE POUR CALL OF DUTY: MWIII[/u][/HEADING]
+	`[HEADING=2][u]QUESTIONNAIRE POUR CALL OF DUTY: BO6[/u][/HEADING]
     
     [b]Prénom[/b] : ${first_name}
     [b]Date d'anniversaire[/b] : ${birthdate}
@@ -277,12 +277,12 @@ const postRecruitmentForm = (discordId, connection) =>
 				}
 
 				const data = result[0]
-				const title = `[${data.commando_name.toUpperCase()} - EN ATTENTE]`
+				const title = `[${data.commando_name.toUpperCase()} - EN FORMATION]`
 				const message = buildMessage(data)
 
 				const payload = {
 					node_id: 35,
-					prefix_id: 18,
+					prefix_id: 15,
 					discussion_type: 'discussion',
 					sticky: false,
 					discussion_open: true,
