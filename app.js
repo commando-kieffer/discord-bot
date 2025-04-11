@@ -27,9 +27,10 @@ import {
 	INFOS_SPE_COMMAND,
 	CIVILS_NON_VUS_COMMAND,
 	START_RECRUITMENT_COMMAND,
-  	PROFILE_COMMAND,
+  PROFILE_COMMAND,
 	GET_USERNAME_COMMAND,
-	COMPLAINT_COMMAND
+	COMPLAINT_COMMAND,
+  COIN_FLIP_COMMAND
 } from './commands/index.js'
 
 import {
@@ -45,9 +46,10 @@ import {
 	displayGeneralInfos,
 	displayUnseenCivilians,
 	startRecruitment,
-  	getProfile,
+  getProfile,
 	getUsername,
-	sendComplaint
+	sendComplaint,
+  coinFlip
 } from './logic.js'
 
 import {
@@ -72,6 +74,8 @@ app.get('/redirect', async function (req, res) {
 	console.log(req)
 	res.status(200).send({})
 })
+
+app.use('/public', express.static('public'))
 
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
@@ -186,6 +190,21 @@ app.post('/interactions', async function (req, res) {
 					content: '**Bonjour**,\nje suis le BOT du commando Kieffer ' + getRandomEmoji(),
 				},
 			})
+		}
+
+		if (name === COMMAND_NAMES.COIN_FLIP) {
+			return coinFlip().then(({ status, message, picture }) =>
+        res.status(status).send({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            content: message,
+            embeds: [{
+              image: {
+                url: `${process.env.CK_DISCORD_ROOT}/public/pictures/${picture}`
+              }
+            }]
+          },
+        }))
 		}
 
 		if (name === COMMAND_NAMES.HELP) {
@@ -511,8 +530,10 @@ app.listen(PORT, () => {
 		RECRUITMENT_FORM_1_COMMAND,
 		RECRUITMENT_FORM_2_COMMAND,
 		RECRUITMENT_FORM_3_COMMAND,
-    	PROFILE_COMMAND,
+    PROFILE_COMMAND,
 		GET_USERNAME_COMMAND,
-		COMPLAINT_COMMAND
+		COMPLAINT_COMMAND,
+    COIN_FLIP_COMMAND
 	])
 })
+

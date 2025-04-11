@@ -20,6 +20,7 @@ import {
 	START_RECRUITMENT_COMMAND,
 	PROFILE_COMMAND,
 	GET_USERNAME_COMMAND,
+  COIN_FLIP_COMMAND
 } from './commands/index.js'
 import { forumService } from './services/forum/index.js'
 import { DiscordRequest } from './utils.js'
@@ -44,6 +45,20 @@ export const linkCommando = async (requesterId, [commando, idForum]) => {
 			const message = `Le commando <@${commando}> n'a pas pu être lié au compte forum avec id=${idForum}`
 			return Promise.resolve({ status: 200, message })
 		})
+}
+
+const coin = [
+  { name: 'PILE', picture: 'piece-ck-tail.jpeg' },
+  { name: 'FACE', picture: 'piece-ck-head.jpeg' },
+]
+
+export const coinFlip = async () => {
+  const bit = Math.floor(Math.random() * 2)
+
+  const message = `# C'est tombé sur ${coin[bit].name} !`
+  const picture = coin[bit].picture
+
+  return Promise.resolve({ status: 200, message, picture })
 }
 
 const pointsRemark = (numberOfPoints) => {
@@ -415,6 +430,7 @@ export const help = () => {
 **__Pour tout le monde__**
 - \`/${HELP_COMMAND.name}\` => ${HELP_COMMAND.description}
 - \`/${TEST_COMMAND.name}\` => ${TEST_COMMAND.description}
+- \`/${COIN_FLIP_COMMAND.name}\` => ${COIN_FLIP_COMMAND.description}
 - [Action] \`${GET_USERNAME_COMMAND.name}\` => Affiche le pseudo du membre sélectionné
 - \`/${INFOS_GENERALES_COMMAND.name}\` => ${INFOS_GENERALES_COMMAND.description}
 - \`/${INFOS_SITES_COMMAND.name}\` => ${INFOS_SITES_COMMAND.description}

@@ -79,7 +79,9 @@ export const COMMAND_NAMES = {
 
   CIVILS_NON_VUS: 'civils-non-vus',
 
-  COMPLAINT: 'plainte'
+  COMPLAINT: 'plainte',
+
+  COIN_FLIP: 'flip'
 }
 
 export const TEST_COMMAND = {
@@ -235,3 +237,10 @@ export const ASSIGN_INITIAL_ROLES_COMMAND = {
   ],
   type: 1,
 }
+
+export const COIN_FLIP_COMMAND = {
+  name: COMMAND_NAMES.COIN_FLIP,
+  description: 'Pile ou face',
+  type: 1,
+};
+
