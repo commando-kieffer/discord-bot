@@ -294,7 +294,7 @@ const postRecruitmentForm = (discordId, connection) =>
 					.post(process.env.CK_FORUM_API + '/threads', qs.stringify(payload), {
 						headers: {
 							'content-type': 'application/x-www-form-urlencoded',
-							'XF-Api-Key': 'Se3ClY-SPcIhsDFpFyDnk2sICdyDt7th',
+							'XF-Api-Key': process.env.CK_FORUM_API_KEY,
 							'XF-Api-User': data.userId,
 						},
 					})
