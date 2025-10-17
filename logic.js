@@ -476,7 +476,7 @@ L'histoire : https://commandokieffer.com/history.php
 La galerie : https://commandokieffer.com/galerie.php
 
 **__Les ressources intéressantes__**
-Spé arme CoD BO6 : https://forum.commandokieffer.com/index.php?threads/bo6-sp%C3%A9cialit%C3%A9-arme.3406/
+Spé arme BF6 : https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9cialit%C3%A9-arme.3644/
 Explication des grades : https://forum.commandokieffer.com/index.php?threads/grades-du-commando-kieffer.18/
 `
 
@@ -486,41 +486,38 @@ Explication des grades : https://forum.commandokieffer.com/index.php?threads/gra
 export const displaySpe = () => {
 	const message = `
 # __La spé fusilier__ (_FSL_)
-    
-## __Arme Principale :__
-Tous les Fusils d'assaut.
-**__Accessoire :__**
-- Lunette au-dessus de x3 interdite entre CK ; au delà autorisée en public.
-- Lunette thermique interdite entre CK mais autorisée en public.
-- Aucun lance grenade.
-- Lance grenade fumigène autorisé.
 
-## __Arme Secondaire :__
-Toutes les armes de poings autorisées, __excepté les automatiques__ (GREKHOVA). Aucun lanceur d'engins explosifs (Ex : Javelin)
-**__Accessoire :__**
-- Lunette x1 seulement.
+**Rôle :** Être **polyvalent**, apte à soutenir et renforcer toutes les escouades. Le Fusilier est la **spécialité de base** du groupe : il peut agir en **Soutien**, **Assaut léger** ou **renfort tactique**, selon les besoins de la mission. C’est le soldat fiable, présent sur tous les fronts.
 
-## __Tactique :__
-- Autorisé : Grenade paralysante, grenade flash, fumigène, alarme de proximité, stimulant, leurre et charge electrique.
-- Interdit : Caméra espion.
+**Tag :** Fsl
 
-## __Mortel :__
-- Autorisé : Grenade à fragmentation, bombe collante, grenade thermobarique, grenade d'impact, cocktail molotov et hache de combat.
-- Interdit : Tout le reste.
+**Classe :** Soutien
+**Restriction(s) de classe :**
+- Gadget de classe
+- Capacité active
 
-## __Amélioration de combat :__
-- Autorisé : Systeme trophy, signal leurre, insertion tactique (si autorisée pour le scénario), amplificateur acoustique, gaz neurotoxique et agent dormant.
-- Interdit : Tout le reste.
+**Spécialité(s) autorisée(s) :** Toutes.
 
-## __Atout :__
-Tous autorisés.
 
-## __Jokers :__
-- Interdit : Surarmement.
-- Autorisé : Tout le reste.
+**Arme principale :** Tous les **Fusil d’Assaut** et **Carabine** (hors M4A1, GRT-BC, M277 et M417 A2).
+**Accessoire(s) restreint(s) :**
+- Toutes les **optiques supérieures à x4** exclues.
 
-# __Les autres spé BO6__
-- CoD BO6 : https://forum.commandokieffer.com/index.php?threads/bo6-sp%C3%A9cialit%C3%A9-arme.3406/
+**Arme secondaire :** Tous les **pistolets**.
+**Accessoire(s) restreint(s) :**
+- Toutes les **optiques supérieures à x1.75** exclues.
+
+**Gadget 1 & 2 autorisé(s) :**
+- GPDIS
+- MP-APS
+- Protection déployable
+
+**Grenade(s) autorisée(s) :** Tout **hors** grenade incendiaire.
+
+**Règles d’engagement :** Le Fusilier agit en **appui** : il avance avec l’équipe, renforce la ligne, et adapte son équipement selon les besoins. C’est le **soldat universel** de la bordée.
+
+# __Les autres spé__
+- BF6 : https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9cialit%C3%A9-arme.3644/
 - CoD: UO & CoD II : https://forum.commandokieffer.com/index.php?threads/sp%C3%A9cialisation-armes-cod-uo-et-cod-ii.2252/
 `
 	return Promise.resolve({ status: 200, message })

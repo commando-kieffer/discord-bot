@@ -226,7 +226,7 @@ const buildMessage = ({
 	how_know_us,
 	comment,
 	platform,
-    first_name,
+  first_name,
 	pseudo,
 	commando_name,
 	game_style,
@@ -234,7 +234,7 @@ const buildMessage = ({
 	skills_design,
 	skills_video
 }) =>
-	`[HEADING=2][u]QUESTIONNAIRE POUR CALL OF DUTY: BO6[/u][/HEADING]
+	`[HEADING=2][u]QUESTIONNAIRE POUR BATTLEFIELD 6[/u][/HEADING]
     
     [b]Prénom[/b] : ${first_name}
     [b]Date d'anniversaire[/b] : ${birthdate}
@@ -259,7 +259,7 @@ const buildMessage = ({
     [b]Pouvez vous payer la cotisation annuelle de 10€ ?[/b] : ${SQLBoolToAnswer(can_pay)}
     [b]Comment avez vous connu le Commando Kieffer ?[/b] : ${how_know_us}
     [b]Avez vous un commentaire à formuler ?[/b] : ${comment}
-    `
+`
 
 const postRecruitmentForm = (discordId, connection) =>
 	new Promise((resolve, reject) => {
