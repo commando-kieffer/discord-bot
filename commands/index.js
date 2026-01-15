@@ -70,7 +70,7 @@ export const COMMAND_NAMES = {
 
   // infos
   INFOS_SITES: 'infos-sites',
-  INFOS_SPE: 'infos-spe-arme',
+  INFOS_SPE: 'spe',
   INFOS_GENERALES: 'infos',
 
   // infos membre

@@ -27,11 +27,10 @@ import { DiscordRequest } from './utils.js'
 
 const token = process.env.CK_TOKEN
 
-// ohliger, bolloré, vinat
+// ohliger, bolloré
 const protectedIds = [
 	'224193244555116545',
 	'293826953088073728',
-	'421998930947997706',
 ]
 
 export const linkCommando = async (requesterId, [commando, idForum]) => {
@@ -445,7 +444,7 @@ export const help = () => {
 - [Action] \`${START_RECRUITMENT_COMMAND.name}\` => Démarre la phase de recrutement (donne les permissions pour remplir le formulaire de recrutement)
 
 **__Pour l'État-Major__**
-- [Action] \`${FIRE_COMMAND.name}\` => Radiation du membre séectionné
+- [Action] \`${FIRE_COMMAND.name}\` => Radiation du membre sélectionné
 `
 
 	return Promise.resolve({ status: 200, message })
@@ -464,20 +463,26 @@ export const displayWebsites = () => {
 	const message = `
 **__Les sites importants du CK__**
 
-Le panel : https://zeus.commandokieffer.com/
-La boutique officielle : https://boutique.commandokieffer.com/
-L'accueil : https://commandokieffer.com/
-Le Forum : https://forum.commandokieffer.com/
+Le panel : https://zeus.commandokieffer.com
+Le panel des médailles : https://panel.commandokieffer.com
+
+La boutique officielle : https://boutique.commandokieffer.com
+
+L'accueil : https://commandokieffer.com
+Le Forum : https://forum.commandokieffer.com
 La caserne : https://commandokieffer.com/barracks.php
 Les décorations : https://commandokieffer.com/medal.php
 Les points : https://commandokieffer.com/points.php
 Les métiers : https://commandokieffer.com/metiers.php
 L'histoire : https://commandokieffer.com/history.php
 La galerie : https://commandokieffer.com/galerie.php
+Les archives : https://archive.commandokieffer.com
 
-**__Les ressources intéressantes__**
-Spé arme BF6 : https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9cialit%C3%A9-arme.3644/
+**__Quelques ressources intéressantes__**
+
+Spé arme BF6 : https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9-arme-2026.14081/
 Explication des grades : https://forum.commandokieffer.com/index.php?threads/grades-du-commando-kieffer.18/
+Description des points et médailles : https://forum.commandokieffer.com/index.php?threads/description-des-citations-et-points.187/
 `
 
 	return Promise.resolve({ status: 200, message })
@@ -487,37 +492,40 @@ export const displaySpe = () => {
 	const message = `
 # __La spé fusilier__ (_FSL_)
 
-**Rôle :** Être **polyvalent**, apte à soutenir et renforcer toutes les escouades. Le Fusilier est la **spécialité de base** du groupe : il peut agir en **Soutien**, **Assaut léger** ou **renfort tactique**, selon les besoins de la mission. C’est le soldat fiable, présent sur tous les fronts.
+## Pour recrues et cadets
 
-**Tag :** Fsl
+__Classe :__ Assaut
+__Parcours tactique :__ Les deux
+__Armes :__ Fusil d'assaut et Carabine
+__Fusils autorisés :__ B36A4, KORD 6P67, NVO 228E et L85A3
+__Carabines autorisées :__ M277, M417A2, QBZ 192, SG 553R
+__Accessoires optiques :__ De x1 à x4 compris et seulement
+__Armes secondaires :__ Toutes
+__Accessoires arme secondaire :__ optique x1 seulement
+__Gadgets autorisés classe ASSAUT :__ Echelle et X95 BRE
+__Gadgets non autorisés classe ASSAUT :__ Carabine, DMR, Fusil à Pompe,M320 HE, M320A1 THRM, Balise et SS26.
+__Grenades :__ Toutes
 
-**Classe :** Soutien
-**Restriction(s) de classe :**
-- Gadget de classe
-- Capacité active
+## Pour les autres
 
-**Spécialité(s) autorisée(s) :** Toutes.
-
-
-**Arme principale :** Tous les **Fusil d’Assaut** et **Carabine** (hors M4A1, GRT-BC, M277 et M417 A2).
-**Accessoire(s) restreint(s) :**
-- Toutes les **optiques supérieures à x4** exclues.
-
-**Arme secondaire :** Tous les **pistolets**.
-**Accessoire(s) restreint(s) :**
-- Toutes les **optiques supérieures à x1.75** exclues.
-
-**Gadget 1 & 2 autorisé(s) :**
-- GPDIS
-- MP-APS
-- Protection déployable
-
-**Grenade(s) autorisée(s) :** Tout **hors** grenade incendiaire.
-
-**Règles d’engagement :** Le Fusilier agit en **appui** : il avance avec l’équipe, renforce la ligne, et adapte son équipement selon les besoins. C’est le **soldat universel** de la bordée.
+__Classe :__ Soutien et Assaut
+__Parcours tactique Assaut :__ Les deux.
+__Parcours tactique Soutien :__ Soutien tacticque (Pas medecine de guerre)
+__Armes :__ Fusil d'assaut et Carabine
+__Fusils autorisés :__ M433, B36A4, TR-7 , KORD 6P67, NVO 228E et L85A3
+__Carabines autorisées :__ M277, AK 205, M417A2, QBZ 192, SG 553R
+__Accessoires optiques :__ De x1 à x4 compris et seulement
+__Armes secondaires :__ Toutes
+__Accessoires arme secondaire :__ optique x1 seulement
+__GADGETS DE CLASSE SOUTIEN :__ INTERDIT, seulement pour les infirmiers
+__Gadgets autorisés classe ASSAUT :__ Echelle et X95 BRE. (M320HE autorisé sous condition d'avoir des grenade flash ou Incapacitante)
+__Gadgets non autorisés classe ASSAUT :__ Carabine, DMR, Fusil à Pompe, M320A1 THRM, Balise et SS26.
+__Gadgets autorisés classe SOUTIEN :__ M320A1 FMG ,GPDIS, MP APS et Protection déployable
+__Gadgets non autorisés classe SOUTIEN :__ Défibrilateur, LWCMS, PB SIch G1 et Pochette de ravitaillement
+__Grenades :__ Frag, incapacitante et flash
 
 # __Les autres spé__
-- BF6 : https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9cialit%C3%A9-arme.3644/
+- BF6 : https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9-arme-2026.14081/
 - CoD: UO & CoD II : https://forum.commandokieffer.com/index.php?threads/sp%C3%A9cialisation-armes-cod-uo-et-cod-ii.2252/
 `
 	return Promise.resolve({ status: 200, message })
