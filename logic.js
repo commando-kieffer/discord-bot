@@ -105,8 +105,8 @@ export const getProfile = async (requesterId) => {
 <@${requesterId}>, voici le résumé de votre profil :
 
 Votre profil forum : https://forum.commandokieffer.com/index.php?members/${data.user_id}.
-Vous avez accumulé un total de **${data.medals_count} médailles**. Pour voir lesquelles, rendez-vous ici : https://commandokieffer.com/medal.php
-Vous avez un total de **${data.panel_pts} points**. ${pointsRemark(data.panel_pts)} Pour voir le classement, c'est ici : https://commandokieffer.com/points.php
+Vous avez accumulé un total de **${data.medals_count} médailles**. Pour voir lesquelles, rendez-vous ici : https://commandokieffer.com/decorations
+Vous avez un total de **${data.panel_pts} points**. ${pointsRemark(data.panel_pts)} Pour voir le classement, c'est ici : https://commandokieffer.com/points
 Vous avez été présent à **${data.panel_prs} missions** du vendredi et en avez manqué **${data.panel_abs}**, ce qui fait un taux de présence de **${(
 						(data.panel_prs === 0
 							? 0
@@ -470,12 +470,12 @@ La boutique officielle : https://boutique.commandokieffer.com
 
 L'accueil : https://commandokieffer.com
 Le Forum : https://forum.commandokieffer.com
-La caserne : https://commandokieffer.com/barracks.php
-Les décorations : https://commandokieffer.com/medal.php
-Les points : https://commandokieffer.com/points.php
-Les métiers : https://commandokieffer.com/metiers.php
-L'histoire : https://commandokieffer.com/history.php
-La galerie : https://commandokieffer.com/galerie.php
+La caserne : https://commandokieffer.com/caserne
+Les décorations : https://commandokieffer.com/decorations
+Les points : https://commandokieffer.com/points
+Les métiers : https://commandokieffer.com/metiers
+L'histoire : https://commandokieffer.com/histoire
+La galerie : https://commandokieffer.com/galerie
 Les archives : https://archive.commandokieffer.com
 
 **__Quelques ressources intéressantes__**
