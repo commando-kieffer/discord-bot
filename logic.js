@@ -492,40 +492,46 @@ export const displaySpe = () => {
 	const message = `
 # __La spé fusilier__ (_FSL_)
 
-## Pour recrues et cadets
+## __Pour les recrues et cadets__
 
-__Classe :__ Assaut
-__Parcours tactique :__ Les deux
-__Armes :__ Fusil d'assaut et Carabine
-__Fusils autorisés :__ B36A4, KORD 6P67, NVO 228E et L85A3
-__Carabines autorisées :__ M277, M417A2, QBZ 192, SG 553R
-__Accessoires optiques :__ De x1 à x4 compris et seulement
-__Armes secondaires :__ Toutes
-__Accessoires arme secondaire :__ optique x1 seulement
-__Gadgets autorisés classe ASSAUT :__ Echelle et X95 BRE
-__Gadgets non autorisés classe ASSAUT :__ Carabine, DMR, Fusil à Pompe,M320 HE, M320A1 THRM, Balise et SS26.
-__Grenades :__ Toutes
+**Classe :** Assaut  
+**Parcours tactique :** Les deux  
+**Arme :** Fusil d'assaut  
+**Fusil d'assaut autorisé :** M433, B36A4, SOR 556  
+**Accessoire optique :** De x1 à x2.5 seulement.  
+**Arme secondaire:** P18  
+**Accessoire arme secondaire :** optique x1 uniquement.  
+**Gadget autorisé :** Échelle et X95 BRE.  
+**Gadget Interdit :** Carabine, DMR, Fusil à pompe, M320 HE, M320A1 THRM, Balise et SS26.  
+**Grenade :** Flash ou Incapacitante
 
-## Pour les autres
+## __Pour les autres__
 
-__Classe :__ Soutien et Assaut
-__Parcours tactique Assaut :__ Les deux.
-__Parcours tactique Soutien :__ Soutien tacticque (Pas medecine de guerre)
-__Armes :__ Fusil d'assaut et Carabine
-__Fusils autorisés :__ M433, B36A4, TR-7 , KORD 6P67, NVO 228E et L85A3
-__Carabines autorisées :__ M277, AK 205, M417A2, QBZ 192, SG 553R
-__Accessoires optiques :__ De x1 à x4 compris et seulement
-__Armes secondaires :__ Toutes
-__Accessoires arme secondaire :__ optique x1 seulement
-__GADGETS DE CLASSE SOUTIEN :__ INTERDIT, seulement pour les infirmiers
-__Gadgets autorisés classe ASSAUT :__ Echelle et X95 BRE. (M320HE autorisé sous condition d'avoir des grenade flash ou Incapacitante)
-__Gadgets non autorisés classe ASSAUT :__ Carabine, DMR, Fusil à Pompe, M320A1 THRM, Balise et SS26.
-__Gadgets autorisés classe SOUTIEN :__ M320A1 FMG ,GPDIS, MP APS et Protection déployable
-__Gadgets non autorisés classe SOUTIEN :__ Défibrilateur, LWCMS, PB SIch G1 et Pochette de ravitaillement
-__Grenades :__ Frag, incapacitante et flash
+**Arme :** Fusil d'assaut et Carabine  
+**Fusil D’assaut Auto**risé : M433, B36A4, SOR 556, TR-7, NVO-228E, L85A3,   
+**Carabine autorisée :** AK205, QBZ-192, SG 553R  
+**Fusil mitrailleur autorisé :** DRS-IAR (chargeur 45, 50, 60 Balles interdits)  
+**Accessoire optique :** De x1 à x4 compris uniquement.  
+**Arme secondaire :** Tous Sauf Vz.61, M44 et M357  
+**Accessoire arme secondaire :** x1 seulement.  
+**Classe :** 
+
+### 1\) Assaut :
+
+**Parcours tactique Assaut:** Les deux  
+**Gadget Autorisé :** Échelle D’assaut, X95BRE, M320A1 THRM   
+**Gadget Interdit :** Carabine, DMR, Fusil à pompe, M320A1 EXPL, Balise de déploiement, SS26  
+**Grenade:** Incapacitante, Flash, Frag ( si Pas de M320THRM équipé)
+
+### 2\) Soutien :   
+
+**Parcours tactique Soutien:** Les deux  
+**Gadget Autorisé :** GPDIS, MP-APS, M320A1 FMG, Protection déployable  
+**Gadget Interdit :** Défibrillateur, LWCMS, PB SICH G1, Pochette de ravitaillement  
+**Grenade:** Fumigène, Frag (Si le M320 FMG est équipé)
 
 # __Les autres spé__
-- BF6 : https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9-arme-2026.14081/
+- BF6 : https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9-arme-2026.17162/
 - CoD: UO & CoD II : https://forum.commandokieffer.com/index.php?threads/sp%C3%A9cialisation-armes-cod-uo-et-cod-ii.2252/
 `
 	return Promise.resolve({ status: 200, message })
