@@ -30,7 +30,6 @@ const token = process.env.CK_TOKEN
 // ohliger, bolloré
 const protectedIds = [
 	'224193244555116545',
-	'293826953088073728',
 ]
 
 export const linkCommando = async (requesterId, [commando, idForum]) => {
@@ -222,7 +221,7 @@ export const fireCommando = async (requesterId, commando) => {
 					})
 			})
 		} catch (e) {
-			resolve({ status: 500, message: e })
+			resolve({ status: 200, message: e })
 		}
 	})
 }
