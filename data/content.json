@@ -1,0 +1,133 @@
+{
+	"game": "Battlefield 6",
+	"links": {
+		"forumProfile": "https://forum.commandokieffer.com/index.php?members/{userId}",
+		"medals": "https://commandokieffer.com/decorations",
+		"pointsRanking": "https://commandokieffer.com/points"
+	},
+	"websites": [
+		{
+			"title": "Les sites importants du CK",
+			"groups": [
+				[
+					{
+						"label": "Le panel",
+						"url": "https://zeus.commandokieffer.com"
+					},
+					{
+						"label": "Le panel des médailles",
+						"url": "https://panel.commandokieffer.com"
+					}
+				],
+				[
+					{
+						"label": "La boutique officielle",
+						"url": "https://boutique.commandokieffer.com"
+					}
+				],
+				[
+					{
+						"label": "L'accueil",
+						"url": "https://commandokieffer.com"
+					},
+					{
+						"label": "Le Forum",
+						"url": "https://forum.commandokieffer.com"
+					},
+					{
+						"label": "La caserne",
+						"url": "https://commandokieffer.com/caserne"
+					},
+					{
+						"label": "Les décorations",
+						"url": "https://commandokieffer.com/decorations"
+					},
+					{
+						"label": "Les points",
+						"url": "https://commandokieffer.com/points"
+					},
+					{
+						"label": "Les métiers",
+						"url": "https://commandokieffer.com/metiers"
+					},
+					{
+						"label": "L'histoire",
+						"url": "https://commandokieffer.com/histoire"
+					},
+					{
+						"label": "La galerie",
+						"url": "https://commandokieffer.com/galerie"
+					},
+					{
+						"label": "Les archives",
+						"url": "https://archive.commandokieffer.com"
+					}
+				]
+			]
+		},
+		{
+			"title": "Quelques ressources intéressantes",
+			"groups": [
+				[
+					{
+						"label": "Spé arme BF6",
+						"url": "https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9-arme-2026.14081/"
+					},
+					{
+						"label": "Explication des grades",
+						"url": "https://forum.commandokieffer.com/index.php?threads/grades-du-commando-kieffer.18/"
+					},
+					{
+						"label": "Description des points et médailles",
+						"url": "https://forum.commandokieffer.com/index.php?threads/description-des-citations-et-points.187/"
+					}
+				]
+			]
+		}
+	],
+	"spe": [
+		"# __La spé fusilier__ (_FSL_)",
+		"",
+		"## __Pour les recrues et cadets__",
+		"",
+		"**Classe :** Assaut  ",
+		"**Parcours tactique :** Les deux  ",
+		"**Arme :** Fusil d'assaut  ",
+		"**Fusil d'assaut autorisé :** M433, B36A4, SOR 556  ",
+		"**Accessoire optique :** De x1 à x2.5 seulement.  ",
+		"**Arme secondaire:** P18  ",
+		"**Accessoire arme secondaire :** optique x1 uniquement.  ",
+		"**Gadget autorisé :** Échelle et X95 BRE.  ",
+		"**Gadget Interdit :** Carabine, DMR, Fusil à pompe, M320 HE, M320A1 THRM, Balise et SS26.  ",
+		"**Grenade :** Flash ou Incapacitante",
+		"",
+		"## __Pour les autres__",
+		"",
+		"**Arme :** Fusil d'assaut et Carabine  ",
+		"**Fusil D’assaut Auto**risé : M433, B36A4, SOR 556, TR-7, NVO-228E, L85A3,   ",
+		"**Carabine autorisée :** AK205, QBZ-192, SG 553R  ",
+		"**Fusil mitrailleur autorisé :** DRS-IAR (chargeur 45, 50, 60 Balles interdits)  ",
+		"**Accessoire optique :** De x1 à x4 compris uniquement.  ",
+		"**Arme secondaire :** Tous Sauf Vz.61, M44 et M357  ",
+		"**Accessoire arme secondaire :** x1 seulement.  ",
+		"**Classe :** ",
+		"",
+		"### 1) Assaut :",
+		"",
+		"**Parcours tactique Assaut:** Les deux  ",
+		"**Gadget Autorisé :** Échelle D’assaut, X95BRE, M320A1 THRM   ",
+		"**Gadget Interdit :** Carabine, DMR, Fusil à pompe, M320A1 EXPL, Balise de déploiement, SS26  ",
+		"**Grenade:** Incapacitante, Flash, Frag ( si Pas de M320THRM équipé)",
+		"",
+		"### 2) Soutien :   ",
+		"",
+		"**Parcours tactique Soutien:** Les deux  ",
+		"**Gadget Autorisé :** GPDIS, MP-APS, M320A1 FMG, Protection déployable  ",
+		"**Gadget Interdit :** Défibrillateur, LWCMS, PB SICH G1, Pochette de ravitaillement  ",
+		"**Grenade:** Fumigène, Frag (Si le M320 FMG est équipé)",
+		"",
+		"# __Les autres spé__",
+		"- BF6 : https://forum.commandokieffer.com/index.php?threads/bf6-sp%C3%A9-arme-2026.17162/",
+		"- CoD: UO & CoD II : https://forum.commandokieffer.com/index.php?threads/sp%C3%A9cialisation-armes-cod-uo-et-cod-ii.2252/"
+	]
+}

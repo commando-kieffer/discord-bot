@@ -1,12 +1,16 @@
 {
   "name": "ck-discord-bot",
-  "version": "2.1.260115",
+  "version": "2.2.261103",
   "description": "",
   "main": "app.js",
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "engines": {
+    "node": ">=20"
   },
   "author": "Ohliger",
   "license": "MIT",
