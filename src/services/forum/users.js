@@ -1,41 +1,54 @@
+import { XenforoApiError } from '../../clients/xenforo.js'
 import { ForumError, createQueryRunner } from './errors.js'
 
-export function createUsersRepository({ db, logger }) {
+export function createUsersRepository({ db, xenforo, logger }) {
 	const run = createQueryRunner(db, logger)
 
-	const setRoles = async (discordId, nom, main, secondary) => {
-		const result = await run(
-			`UPDATE xf_user
-			SET
-				username = ?,
-				user_group_id = ?,
-				secondary_group_ids = ?
-			WHERE
-				discord_id = ?`,
-			[nom, main, secondary.filter(Boolean).join(','), discordId],
-			{
-				onConnectionError: 'Erreur de connexion à la base de données. CODE U14',
-				onError: 'Une erreur est survenue. CODE U29',
-				context: { discordId },
-			}
-		)
-
-		if (!result || result.affectedRows === 0) {
-			throw new ForumError("Aucun compte forum n'est lié à ce compte Discord. CODE U32")
-		}
-
-		return 'Les permissions de base ont été correctement attribuées.'
-	}
-
-	// Compte forum lié à un compte Discord, ou null
-	const findLinkedAccount = async (discordId) => {
-		const result = await run('SELECT user_id, username FROM xf_user WHERE discord_id = ? LIMIT 1', [discordId], {
+	// Comptes forum liés à un compte Discord (normalement un seul). discord_id n'existe pas dans l'API
+	// de XenForo : la recherche se fait en base.
+	const findLinkedAccounts = (discordId) =>
+		run('SELECT user_id, username FROM xf_user WHERE discord_id = ? LIMIT 2', [discordId], {
 			onConnectionError: 'Erreur de connexion à la base de données. CODE U14',
 			onError: 'Une erreur est survenue. CODE U29',
 			context: { discordId },
 		})
 
-		return result[0] ?? null
+	// Compte forum lié à un compte Discord, ou null
+	const findLinkedAccount = async (discordId) => (await findLinkedAccounts(discordId))[0] ?? null
+
+	// Pseudo, groupe principal et groupes secondaires : modifiés via l'API du forum pour que XenForo
+	// recalcule lui-même les permissions (une mise à jour directe de xf_user ne le fait pas)
+	const setRoles = async (discordId, nom, main, secondary) => {
+		const accounts = await findLinkedAccounts(discordId)
+
+		if (accounts.length === 0) {
+			throw new ForumError("Aucun compte forum n'est lié à ce compte Discord. CODE U32")
+		}
+		if (accounts.length > 1) {
+			logger.error('Plusieurs comptes forum liés au même compte Discord', { discordId })
+			throw new ForumError('Plusieurs comptes forum sont liés à ce compte Discord. CODE U35')
+		}
+
+		const forumUserId = accounts[0].user_id
+
+		try {
+			await xenforo.updateUser(forumUserId, {
+				username: nom,
+				user_group_id: main,
+				secondary_group_ids: secondary.filter(Boolean),
+			})
+		} catch (err) {
+			logger.error('Mise à jour du compte forum impossible', { discordId, forumUserId, error: err })
+			const reasons = err instanceof XenforoApiError ? err.forumMessages : []
+			throw new ForumError(
+				`La mise à jour du compte forum a échoué${reasons.length ? ` (${reasons.join(' ')})` : ''}. CODE U41`,
+				{ cause: err }
+			)
+		}
+
+		logger.info('Compte forum mis à jour', { discordId, forumUserId, username: nom, userGroupId: main })
+
+		return 'Les permissions de base ont été correctement attribuées.'
 	}
 
 	const last = async () => {

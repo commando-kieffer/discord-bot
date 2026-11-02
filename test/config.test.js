@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { ConfigError, DEFAULT_RECRUE_ROLE, checkForumApiUrl, deepFreeze, listMissingVars, loadConfig } from '../src/config.js'
+import { ConfigError, DEFAULT_FORUM_API_USER, DEFAULT_RECRUE_ROLE, checkForumApiUrl, deepFreeze, listMissingVars, loadConfig } from '../src/config.js'
 import { ids, testEnv } from './support/fakes.js'
 
 describe('loadConfig', () => {
@@ -31,6 +31,13 @@ describe('loadConfig', () => {
 		assert.equal(loadConfig(testEnv({ RECRUE_ROLE: undefined })).roles.recrue, DEFAULT_RECRUE_ROLE)
 		assert.equal(DEFAULT_RECRUE_ROLE, '1318565126516772985')
 		assert.equal(loadConfig(testEnv({ RECRUE_ROLE: '300000000000000099' })).roles.recrue, '300000000000000099')
+	})
+
+	it('agit sur le forum au nom du compte Commando Kieffer par défaut', () => {
+		assert.equal(loadConfig(testEnv()).forum.apiUser, DEFAULT_FORUM_API_USER)
+		assert.equal(DEFAULT_FORUM_API_USER, '8')
+		assert.equal(loadConfig(testEnv({ CK_FORUM_API_USER: '33' })).forum.apiUser, '33')
+		assert.throws(() => loadConfig(testEnv({ CK_FORUM_API_USER: '8; DROP' })), /CK_FORUM_API_USER/)
 	})
 
 	it('permet de changer l\'hôte de la base', () => {

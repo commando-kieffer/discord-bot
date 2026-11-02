@@ -59,6 +59,39 @@ describe('client XenForo', () => {
 		assert.ok(call.timeout > 0)
 	})
 
+	it('modifie un compte au nom du compte du bot, sans contourner les permissions', async () => {
+		const http = fakeHttp({ success: true, user: { user_id: 7526, username: 'Kieffer' } })
+		const client = createXenforoClient({ apiUrl: API, apiKey: 'key', apiUser: '8', http })
+
+		const user = await client.updateUser(7526, { username: 'Kieffer', user_group_id: '5', secondary_group_ids: ['30', '42'] })
+
+		assert.deepEqual(user, { user_id: 7526, username: 'Kieffer' })
+		const [call] = http.calls
+		assert.equal(call.method, 'POST')
+		assert.equal(call.url, `${API}/users/7526`)
+		assert.equal(call.headers['XF-Api-User'], '8')
+		assert.equal(decodeURIComponent(call.data), 'username=Kieffer&user_group_id=5&secondary_group_ids[]=30&secondary_group_ids[]=42')
+		assert.doesNotMatch(call.data, /api_bypass_permissions/)
+	})
+
+	it('vide les groupes secondaires d\'un compte', async () => {
+		const http = fakeHttp({ success: true, user: {} })
+		await createXenforoClient({ apiUrl: API, apiKey: 'key', apiUser: '8', http }).updateUser('7526', {
+			username: 'Ex Kieffer',
+			user_group_id: '2',
+			secondary_group_ids: [],
+		})
+		assert.equal(http.calls[0].data, 'username=Ex%20Kieffer&user_group_id=2&secondary_group_ids=')
+	})
+
+	it('refuse un identifiant de compte invalide, y compris pour le compte du bot', async () => {
+		const http = fakeHttp({})
+		const client = createXenforoClient({ apiUrl: API, apiKey: 'key', apiUser: '8', http })
+		await assert.rejects(client.updateUser('7526/../1', {}), TypeError)
+		await assert.rejects(createXenforoClient({ apiUrl: API, apiKey: 'key', http }).updateUser(1, {}), TypeError)
+		assert.equal(http.calls.length, 0)
+	})
+
 	it('refuse un compte forum invalide sans appeler l\'API', async () => {
 		const http = fakeHttp({})
 		const client = createXenforoClient({ apiUrl: API, apiKey: 'key', http })

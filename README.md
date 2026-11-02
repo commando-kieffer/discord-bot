@@ -26,8 +26,19 @@ celles listées dans `REMOVED_COMMANDS` (`src/commands/definitions.js`).
   Il peut être modifié sans toucher au code ; il est vérifié au démarrage (un lien doit être en https).
   Redémarrer le bot après modification.
 
-L'API du forum doit être appelée en https. Seul le forum de test local (`http://forum.commandokieffer.ch`)
-est accepté en http, car la clé d'API est une clé super-utilisateur.
+## Forum
+
+Les comptes XenForo (pseudo, groupe principal, groupes secondaires) sont modifiés via l'API REST du forum,
+au nom du compte administrateur `CK_FORUM_API_USER` (8, « Commando Kieffer », par défaut) : XenForo
+recalcule les permissions et applique ses propres règles (pseudo unique, super-administrateurs protégés...).
+Les fiches de recrutement sont postées au nom de la recrue.
+
+La base de données reste utilisée pour ce que l'API ne connaît pas : la colonne `xf_user.discord_id`, les
+tables du CK (`infos_recrutement`, `complaint`, `medal_attribut`) et les compteurs du panel.
+
+L'API doit être appelée en https (`https://forum.commandokieffer.com/index.php/api` en production). Seul le
+forum de test local (`http://forum.commandokieffer.ch/index.php/api`, sous WAMP) est accepté en http, car la
+clé d'API est une clé super-utilisateur.
 
 ## Tests
 

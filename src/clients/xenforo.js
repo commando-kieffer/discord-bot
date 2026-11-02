@@ -58,8 +58,9 @@ export const encodeForm = (params) =>
 		{ arrayFormat: 'brackets' }
 	)
 
-export function createXenforoClient({ apiUrl, apiKey, http = axios, timeoutMs = 10_000 }) {
-	async function call(method, path, { params, asUser } = {}) {
+// `apiUser` est le compte forum au nom duquel le bot agit par défaut (CK_FORUM_API_USER)
+export function createXenforoClient({ apiUrl, apiKey, apiUser, http = axios, timeoutMs = 10_000 }) {
+	async function call(method, path, { params, asUser = apiUser } = {}) {
 		if (!apiUrl || !apiKey) {
 			throw new XenforoApiError("L'API du forum n'est pas configurée (CK_FORUM_API, CK_FORUM_API_KEY)", { method, path })
 		}
@@ -92,6 +93,12 @@ export function createXenforoClient({ apiUrl, apiKey, http = axios, timeoutMs = 
 	}
 
 	return {
+		// Sans contournement des permissions : XenForo vérifie que le compte du bot est administrateur,
+		// et refuse par exemple de modifier un super-administrateur.
+		// Champs acceptés : https://xenforo.com/community/pages/api-endpoints/#route_post_users_id_
+		updateUser: async (userId, fields) =>
+			(await call('POST', `/users/${forumUserId(userId)}`, { params: fields, asUser: forumUserId(apiUser) })).user,
+
 		createThread: async ({ asUser, ...fields }) =>
 			(await call('POST', '/threads', { params: fields, asUser: forumUserId(asUser) })).thread,
 	}

@@ -30,6 +30,9 @@ const EXPECTED_VARS = [
 // Rôle « Recrue » du serveur, ajouté après les autres : la valeur par défaut évite de devoir modifier les .env existants
 export const DEFAULT_RECRUE_ROLE = '1318565126516772985'
 
+// Compte forum « Commando Kieffer » (administrateur) au nom duquel le bot modifie les comptes, le même que Zeus
+export const DEFAULT_FORUM_API_USER = '8'
+
 // Le forum de test tourne sous WAMP sans certificat : c'est le seul cas où l'API peut être appelée en http
 const HTTP_FORUM_HOSTS = ['forum.commandokieffer.ch', 'localhost', '127.0.0.1']
 
@@ -71,6 +74,11 @@ export function loadConfig(env = process.env) {
 	const missing = REQUIRED_VARS.filter((name) => !env[name])
 	if (missing.length) {
 		throw new ConfigError(`Variables d'environnement manquantes : ${missing.join(', ')}`)
+	}
+
+	const forumApiUser = env.CK_FORUM_API_USER || DEFAULT_FORUM_API_USER
+	if (!/^\d+$/.test(forumApiUser)) {
+		throw new ConfigError(`CK_FORUM_API_USER doit être un identifiant de compte forum : ${forumApiUser}`)
 	}
 
 	return deepFreeze({
@@ -121,6 +129,7 @@ export function loadConfig(env = process.env) {
 		forum: {
 			apiUrl: checkForumApiUrl(env.CK_FORUM_API),
 			apiKey: env.CK_FORUM_API_KEY || '',
+			apiUser: forumApiUser,
 		},
 		db: {
 			host: env.DB_HOST || 'localhost',
