@@ -83,6 +83,15 @@ describe('comptes forum : lectures', () => {
 		await rejectsWith(setup([[/SELECT/, sqlError('ETIMEDOUT')]]).users.getUsername('1'), 'Erreur de connexion à la base de données. CODE U130')
 	})
 
+	it('findLinkedAccount renvoie le compte forum lié, ou null', async () => {
+		const { db, users } = setup([[/SELECT user_id, username FROM xf_user WHERE discord_id = \? LIMIT 1/, [{ user_id: 7526, username: 'MoziSkync' }]]])
+		assert.deepEqual(await users.findLinkedAccount(ids.target), { user_id: 7526, username: 'MoziSkync' })
+		assert.deepEqual(db.calls[0].params, [ids.target])
+
+		assert.equal(await setup([[/SELECT/, []]]).users.findLinkedAccount(ids.target), null)
+		await rejectsWith(setup([[/SELECT/, sqlError('ECONNREFUSED')]]).users.findLinkedAccount('1'), 'Erreur de connexion à la base de données. CODE U14')
+	})
+
 	it('n\'insère jamais les valeurs dans le texte SQL', async () => {
 		const { db, users } = setup([[/SELECT/, []]])
 		await users.info("1' OR '1'='1")

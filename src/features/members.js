@@ -1,6 +1,6 @@
 import { subDays, isBefore } from 'date-fns'
 import { buildLinkForm } from '../forms/link-form.js'
-import { buildFormerNick, extractCommandoName } from '../ranks.js'
+import { buildFormerNick, extractCommandoName, getUnitRoles } from '../ranks.js'
 import { isProtected } from '../security/protected-members.js'
 import { isSnowflake, parseForumId } from '../security/validation.js'
 import { toUserMessage } from '../services/forum/errors.js'
@@ -36,7 +36,8 @@ export function createMembersFeature({ discord, forum, config, logger, now = () 
 		return buildLinkForm(userToLink, lastUsers)
 	}
 
-	const startRecruitment = async (requesterId, userId) => {
+	// « Lier au forum » : lie les comptes, puis donne le rôle de civil en recrutement (accès aux questionnaires)
+	const linkAndStartRecruitment = async (requesterId, userId, idForum) => {
 		if (isProtected(userId)) {
 			return {
 				status: 200,
@@ -44,16 +45,54 @@ export function createMembersFeature({ discord, forum, config, logger, now = () 
 			}
 		}
 
-		const message = `Démarrage du recrutement de <@${userId}>`
+		const forumId = parseForumId(idForum)
+		if (!forumId) {
+			return { status: 200, message: `L'ID forum doit être un nombre (reçu : ${String(idForum ?? '').slice(0, 20)}).` }
+		}
+
+		let created
+		try {
+			created = await forum.link.link(userId, forumId)
+		} catch (err) {
+			const message = `Le commando <@${userId}> n'a pas pu être lié au compte forum avec id=${forumId}.\n${toUserMessage(err)}`
+			return { status: 200, message }
+		}
+
+		if (created) logger.info('Compte Discord lié au forum', { requesterId, userId, forumId })
+
+		const lines = [
+			created
+				? `Le commando <@${userId}> est lié au compte forum avec id=${forumId}`
+				: `Le commando <@${userId}> était déjà lié au compte forum avec id=${forumId}`,
+		]
+		const done = () => ({ status: 200, message: lines.join('\n') })
+
+		let member
+		try {
+			member = await discord.getMember(userId)
+		} catch (err) {
+			logger.error('Membre introuvable pour le recrutement', { requesterId, userId, error: err })
+			lines.push(`Impossible de vérifier ses rôles Discord : le recrutement n'a pas été lancé.`)
+			return done()
+		}
+
+		// Les rôles sont remplacés : on ne le fait pas pour quelqu'un qui fait déjà partie du CK
+		const unitRoles = getUnitRoles(roles)
+		if ((member.roles ?? []).some((role) => unitRoles.includes(role))) {
+			lines.push(`Ses rôles n'ont pas été changés : <@${userId}> fait déjà partie du CK.`)
+			return done()
+		}
 
 		try {
 			await discord.updateMember(userId, { roles: [roles.recruiting] })
 			logger.info('Recrutement lancé', { requesterId, userId })
-			return { status: 200, message }
+			lines.push(`Démarrage du recrutement de <@${userId}>`)
 		} catch (err) {
 			logger.error('Recrutement non lancé', { requesterId, userId, error: err })
-			return { status: 200, message: `Le recrutement de <@${userId}> n'a pas pu être lancé.` }
+			lines.push(`Le recrutement de <@${userId}> n'a pas pu être lancé.`)
 		}
+
+		return done()
 	}
 
 	const fireCommando = async (requesterId, commando) => {
@@ -137,5 +176,5 @@ export function createMembersFeature({ discord, forum, config, logger, now = () 
 		}
 	}
 
-	return { linkCommando, openLinkForm, startRecruitment, fireCommando, displayUnseenCivilians }
+	return { linkCommando, openLinkForm, linkAndStartRecruitment, fireCommando, displayUnseenCivilians }
 }

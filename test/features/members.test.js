@@ -80,36 +80,86 @@ describe('lier au forum', () => {
 	})
 })
 
-describe('lancer le recrutement', () => {
-	it('donne le rôle de civil en recrutement', async () => {
-		const { discord, members } = setup()
-		assert.deepEqual(await members.startRecruitment(ids.requester, ids.target), {
+describe('lier au forum et lancer le recrutement', () => {
+	const civil = { nick: null, roles: [ids.roles.civilEnAttente] }
+
+	it('lie les comptes puis donne le rôle de civil en recrutement', async () => {
+		const { discord, forum, members } = setup({ discord: { getMember: async () => civil } })
+		assert.deepEqual(await members.linkAndStartRecruitment(ids.requester, ids.target, '7526'), {
 			status: 200,
-			message: `Démarrage du recrutement de <@${ids.target}>`,
+			message: `Le commando <@${ids.target}> est lié au compte forum avec id=7526\nDémarrage du recrutement de <@${ids.target}>`,
 		})
+		assert.deepEqual(callsOf(forum.link.link), [[ids.target, 7526]])
 		assert.deepEqual(callsOf(discord.updateMember), [[ids.target, { roles: [ids.roles.recruiting] }]])
 	})
 
-	it('refuse pour un membre protégé', async () => {
-		const { discord, members } = setup()
-		const { message } = await members.startRecruitment(ids.requester, ids.protected)
-		assert.match(message, /^\*\*Action prohibée\*\*/)
+	it('lance le recrutement même si le lien existait déjà', async () => {
+		const { discord, members } = setup({ discord: { getMember: async () => civil }, link: { link: async () => false } })
+		const { message } = await members.linkAndStartRecruitment(ids.requester, ids.target, '7526')
+		assert.match(message, /était déjà lié au compte forum avec id=7526\nDémarrage du recrutement/)
+		assert.equal(discord.updateMember.mock.callCount(), 1)
+	})
+
+	it("ne touche pas aux rôles de quelqu'un qui fait déjà partie du CK", async () => {
+		for (const role of [ids.roles.cadet, ids.roles.recrue, ids.roles.em, ids.roles.t8b1]) {
+			const { discord, members } = setup({ discord: { getMember: async () => ({ roles: [ids.roles.civil, role] }) } })
+			const { message } = await members.linkAndStartRecruitment(ids.requester, ids.target, '7526')
+			assert.match(message, /Ses rôles n'ont pas été changés : <@100000000000000002> fait déjà partie du CK\.$/)
+			assert.equal(discord.updateMember.mock.callCount(), 0)
+		}
+	})
+
+	it('ne lance pas le recrutement si le lien échoue', async () => {
+		const { discord, members } = setup({
+			link: {
+				link: async () => {
+					throw new ForumError("Aucun compte forum ne porte l'ID 99999. CODE L29")
+				},
+			},
+		})
+		assert.deepEqual(await members.linkAndStartRecruitment(ids.requester, ids.target, '99999'), {
+			status: 200,
+			message: `Le commando <@${ids.target}> n'a pas pu être lié au compte forum avec id=99999.\nAucun compte forum ne porte l'ID 99999. CODE L29`,
+		})
+		assert.equal(discord.getMember.mock.callCount(), 0)
 		assert.equal(discord.updateMember.mock.callCount(), 0)
 	})
 
-	it('prévient si Discord refuse', async () => {
-		const { members, logger } = setup({
+	it("refuse un ID forum qui n'est pas un nombre", async () => {
+		const { forum, members } = setup()
+		assert.match((await members.linkAndStartRecruitment(ids.requester, ids.target, 'abc')).message, /L'ID forum doit être un nombre/)
+		assert.equal(forum.link.link.mock.callCount(), 0)
+	})
+
+	it('refuse pour un membre protégé', async () => {
+		const { forum, members } = setup()
+		const { message } = await members.linkAndStartRecruitment(ids.requester, ids.protected, '1')
+		assert.equal(message, `**Action prohibée** : <@${ids.requester}> a tenté de lancer le recrutement de <@${ids.protected}>`)
+		assert.equal(forum.link.link.mock.callCount(), 0)
+	})
+
+	it('garde le lien si les rôles ne peuvent pas être vérifiés ou changés', async () => {
+		const unreachable = setup({
 			discord: {
+				getMember: async () => {
+					throw discordError(404)
+				},
+			},
+		})
+		const first = await unreachable.members.linkAndStartRecruitment(ids.requester, ids.target, '7526')
+		assert.match(first.message, /est lié au compte forum avec id=7526\nImpossible de vérifier ses rôles Discord : le recrutement n'a pas été lancé\./)
+
+		const refused = setup({
+			discord: {
+				getMember: async () => civil,
 				updateMember: async () => {
 					throw discordError()
 				},
 			},
 		})
-		assert.deepEqual(await members.startRecruitment(ids.requester, ids.target), {
-			status: 200,
-			message: `Le recrutement de <@${ids.target}> n'a pas pu être lancé.`,
-		})
-		assert.equal(logger.entries[0].level, 'error')
+		const second = await refused.members.linkAndStartRecruitment(ids.requester, ids.target, '7526')
+		assert.match(second.message, /\nLe recrutement de <@100000000000000002> n'a pas pu être lancé\.$/)
+		assert.equal(refused.logger.entries.at(-1).level, 'error')
 	})
 })
 

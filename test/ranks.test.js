@@ -2,13 +2,18 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
 	BORDEE,
+	BORDEE_LABELS,
 	GRADE,
 	TROOP,
+	TROOP_LABELS,
 	buildFormerNick,
 	buildNick,
 	extractCommandoName,
+	findRankDefaults,
 	getBordeeAlias,
 	getInitialRoles,
+	getRecruitRoles,
+	getUnitRoles,
 	getTroopAlias,
 	getTroopDiscordRole,
 	isBordee,
@@ -41,9 +46,14 @@ describe('alias de troop et de bordée', () => {
 })
 
 describe('pseudos', () => {
-	it('construit le pseudo de cadet', () => {
+	it('construit le pseudo de cadet et de recrue', () => {
 		assert.equal(buildNick(GRADE.CADET, 'Kieffer', TROOP.T1), 'Cadet.Kieffer-1Fsl')
 		assert.equal(buildNick(GRADE.CADET, 'Guy', TROOP.T9), 'Cadet.Guy-KGFsl')
+		assert.equal(buildNick(GRADE.RECRUE, 'Kieffer', TROOP.TQG), 'Recrue.Kieffer-QGFsl')
+	})
+
+	it('retrouve le nom dans un pseudo de recrue', () => {
+		assert.equal(extractCommandoName('Recrue.Kieffer-1Fsl'), 'Kieffer')
 	})
 
 	it('construit le pseudo d\'ancien commando avec la date d\'arrivée', () => {
@@ -121,5 +131,53 @@ describe('rôles', () => {
 
 	it('ne donne rien pour une troop inconnue', () => {
 		assert.deepEqual(getInitialRoles('t42', BORDEE.B1, config), [])
+	})
+
+	it('donne à une recrue les rôles Discord d\'un cadet, avec le grade de recrue', () => {
+		assert.deepEqual(getRecruitRoles(TROOP.T8, BORDEE.B2, config.roles), [
+			ids.roles.recrue,
+			ids.roles.membreEquipage,
+			ids.roles.t8,
+			ids.roles.t8b2,
+		])
+		assert.deepEqual(getRecruitRoles(TROOP.T3, BORDEE.B1, config.roles), [ids.roles.recrue, ids.roles.membreEquipage])
+		assert.deepEqual(getRecruitRoles('t42', BORDEE.B1, config.roles), [])
+	})
+
+	it('liste les rôles qui montrent qu\'on fait déjà partie du CK', () => {
+		const unitRoles = getUnitRoles(config.roles)
+		for (const role of [ids.roles.em, ids.roles.qm1, ids.roles.cadet, ids.roles.recrue, ids.roles.membreEquipage, ids.roles.instructeur, ids.roles.t9b1]) {
+			assert.ok(unitRoles.includes(role), role)
+		}
+		for (const role of [ids.roles.civil, ids.roles.civilEnAttente, ids.roles.recruiting, ids.roles.ancienCommando]) {
+			assert.ok(!unitRoles.includes(role), role)
+		}
+		assert.ok(!getUnitRoles({ ...config.roles, em: undefined }).includes(undefined))
+	})
+})
+
+describe('pré-remplissage des formulaires', () => {
+	it('retrouve le nom, la troop et la bordée d\'un membre', () => {
+		const member = { nick: 'Recrue.Kieffer-8Fsl', roles: [ids.roles.recrue, ids.roles.t8, ids.roles.t8b2] }
+		assert.deepEqual(findRankDefaults(member, config.roles), { name: 'Kieffer', troop: 't8', bordee: 'b2' })
+	})
+
+	it('laisse vide ce qui est inconnu', () => {
+		assert.deepEqual(findRankDefaults({ nick: 'Pseudo', roles: [] }, config.roles), { name: null, troop: null, bordee: null })
+		assert.deepEqual(findRankDefaults({ nick: 'Cadet.Kieffer-1Fsl', roles: [ids.roles.t1] }, config.roles), {
+			name: 'Kieffer',
+			troop: 't1',
+			bordee: null,
+		})
+		assert.deepEqual(findRankDefaults(undefined, config.roles), { name: null, troop: null, bordee: null })
+	})
+
+	it('ignore un nom qui ne serait pas accepté par le formulaire', () => {
+		assert.equal(findRankDefaults({ nick: 'Cadet.X-1Fsl', roles: [] }, config.roles).name, null)
+	})
+
+	it('a un libellé pour chaque troop et chaque bordée', () => {
+		assert.deepEqual(Object.keys(TROOP_LABELS), Object.values(TROOP))
+		assert.deepEqual(Object.keys(BORDEE_LABELS), Object.values(BORDEE))
 	})
 })

@@ -27,6 +27,9 @@ const EXPECTED_VARS = [
 	'SPE_FSL_ROLE_FORUM',
 ]
 
+// Rôle « Recrue » du serveur, ajouté après les autres : la valeur par défaut évite de devoir modifier les .env existants
+export const DEFAULT_RECRUE_ROLE = '1318565126516772985'
+
 // Le forum de test tourne sous WAMP sans certificat : c'est le seul cas où l'API peut être appelée en http
 const HTTP_FORUM_HOSTS = ['forum.commandokieffer.ch', 'localhost', '127.0.0.1']
 
@@ -86,6 +89,7 @@ export function loadConfig(env = process.env) {
 			qm1: env.QM1_ROLE,
 			qm2: env.QM2_ROLE,
 			cadet: env.CADET_ROLE,
+			recrue: env.RECRUE_ROLE || DEFAULT_RECRUE_ROLE,
 			instructeur: env.INSTRUCTEUR_ROLE,
 			recruteur: env.RECRUTEUR_ROLE,
 			membreEquipage: env.MEMBRE_EQUIPAGE_ROLE,

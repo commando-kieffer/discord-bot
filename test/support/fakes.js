@@ -21,6 +21,7 @@ export const ids = {
 		civilEnAttente: '300000000000000009',
 		ancienCommando: '300000000000000010',
 		recruiting: '300000000000000011',
+		recrue: '300000000000000012',
 		t1: '300000000000000101',
 		t1b1: '300000000000000102',
 		t1b2: '300000000000000103',
@@ -54,6 +55,7 @@ export const testEnv = (overrides = {}) => ({
 	CIVIL_EN_ATTENTE_ROLE: ids.roles.civilEnAttente,
 	ANCIEN_COMMANDO_ROLE: ids.roles.ancienCommando,
 	RECRUITING_ROLE: ids.roles.recruiting,
+	RECRUE_ROLE: ids.roles.recrue,
 	T1_ROLE: ids.roles.t1,
 	T1_B1_ROLE: ids.roles.t1b1,
 	T1_B2_ROLE: ids.roles.t1b2,
@@ -156,6 +158,7 @@ export function createFakeForum({ users = {}, link = {}, recruitment = {}, compl
 				info: async () => null,
 				setRoles: async () => 'Les permissions de base ont été correctement attribuées.',
 				getUsername: async () => ({ platform_username: 'Pseudo#1234' }),
+				findLinkedAccount: async () => ({ user_id: 7526, username: 'MoziSkync' }),
 			},
 			users
 		),

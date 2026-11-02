@@ -1,5 +1,3 @@
-import { TROOP, BORDEE } from '../ranks.js'
-
 export const COMMAND_TYPE = {
   CHAT_INPUT: 1,
   USER: 2, // action on user
@@ -19,10 +17,10 @@ export const COMMAND_NAMES = {
   FIRE: 'Radier',
 
   // Pour mettre les droits initiaux
-  ASSIGN_INITIAL_ROLES: 'recrutement',
+  ENROL: 'Enrôler',
+  ASSIGN_INITIAL_ROLES: 'Recrutement',
 
   // Pour questionnaires de recrutement
-  START_RECRUITMENT: 'Lancer le recrutement',
   RECRUITMENT_FORM_1: 'questionnaire-1',
   RECRUITMENT_FORM_2: 'questionnaire-2',
   RECRUITMENT_FORM_3: 'questionnaire-3',
@@ -143,40 +141,14 @@ export const FIRE_COMMAND = {
   type: COMMAND_TYPE.USER, // action on user
 }
 
-export const START_RECRUITMENT_COMMAND = {
-  name: COMMAND_NAMES.START_RECRUITMENT,
+export const ENROL_COMMAND = {
+  name: COMMAND_NAMES.ENROL,
   type: COMMAND_TYPE.USER, // action on user
 }
 
 export const ASSIGN_INITIAL_ROLES_COMMAND = {
   name: COMMAND_NAMES.ASSIGN_INITIAL_ROLES,
-  description: 'Donne les persmissions à la nouvelle recrue',
-  options: [
-    {
-      type: 6, // user
-      name: 'commando',
-      description: 'Choisissez le commando à lier',
-      required: true,
-    }, {
-      type: 3, // string
-      name: 'nom',
-      description: 'Nom choisi par la recrue',
-      required: true
-    }, {
-      type: 3, // string
-      name: 'troop',
-      description: 'Troop de la recrue',
-      required: true,
-      choices: Object.keys(TROOP).map(x => ({ name: x, value: TROOP[x] }))
-    }, {
-      type: 3, // string
-      name: 'bordee',
-      description: 'Bordée de la recrue',
-      required: true,
-      choices: Object.keys(BORDEE).map(x => ({ name: x, value: BORDEE[x] }))
-    },
-  ],
-  type: COMMAND_TYPE.CHAT_INPUT,
+  type: COMMAND_TYPE.USER, // action on user
 }
 
 export const COIN_FLIP_COMMAND = {
@@ -195,9 +167,9 @@ export const REGISTERED_COMMANDS = [
   INFOS_SITES_COMMAND,
   INFOS_SPE_COMMAND,
   CIVILS_NON_VUS_COMMAND,
+  ENROL_COMMAND,
   ASSIGN_INITIAL_ROLES_COMMAND,
   FIRE_COMMAND,
-  START_RECRUITMENT_COMMAND,
   RECRUITMENT_FORM_1_COMMAND,
   RECRUITMENT_FORM_2_COMMAND,
   RECRUITMENT_FORM_3_COMMAND,
@@ -208,4 +180,9 @@ export const REGISTERED_COMMANDS = [
 ]
 
 // Commandes qui n'existent plus, à supprimer chez Discord au démarrage
-export const REMOVED_COMMANDS = []
+export const REMOVED_COMMANDS = [
+  // remplacée par « Lier au forum », qui lance aussi le recrutement
+  { name: 'Lancer le recrutement', type: COMMAND_TYPE.USER },
+  // remplacée par l'action « Recrutement », avec un formulaire
+  { name: 'recrutement', type: COMMAND_TYPE.CHAT_INPUT },
+]

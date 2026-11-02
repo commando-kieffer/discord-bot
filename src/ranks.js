@@ -14,7 +14,22 @@ export const BORDEE = {
 	B2: 'b2',
 }
 
+export const TROOP_LABELS = {
+	[TROOP.T1]: 'Troop 1',
+	[TROOP.T2]: 'Troop 2',
+	[TROOP.T3]: 'Troop 3',
+	[TROOP.T8]: 'Troop 8',
+	[TROOP.T9]: 'Troop 9 (KG)',
+	[TROOP.TQG]: 'Troop QG',
+}
+
+export const BORDEE_LABELS = {
+	[BORDEE.B1]: 'Bordée 1',
+	[BORDEE.B2]: 'Bordée 2',
+}
+
 export const GRADE = {
+	RECRUE: 'Recrue',
 	CADET: 'Cadet',
 }
 
@@ -93,4 +108,43 @@ export const getInitialRoles = (troop, bordee, { roles, forumGroups }) => {
 	}
 
 	return [discordRoles, forumRoles]
+}
+
+// Une recrue a les mêmes rôles Discord qu'un cadet, avec le grade de recrue, et rien sur le forum
+export const getRecruitRoles = (troop, bordee, roles) => {
+	if (!isTroop(troop)) return []
+	return [roles.recrue, roles.membreEquipage, ...troopDiscordRoles(troop, bordee, roles)]
+}
+
+// Rôles qui montrent que la personne fait déjà partie du CK
+export const getUnitRoles = (roles) =>
+	[
+		roles.em,
+		roles.qm1,
+		roles.qm2,
+		roles.cadet,
+		roles.recrue,
+		roles.instructeur,
+		roles.recruteur,
+		roles.membreEquipage,
+		...Object.values(roles.troops).flatMap(({ role, b1, b2 }) => [role, b1, b2]),
+	].filter(Boolean)
+
+// Valeurs déjà connues d'un membre (pseudo et rôles), pour pré-remplir les formulaires
+export const findRankDefaults = (member, roles) => {
+	const memberRoles = member?.roles ?? []
+	const defaults = { name: null, troop: null, bordee: null }
+
+	const name = extractCommandoName(member?.nick)
+	if (name && isValidCommandoName(name)) defaults.name = name
+
+	for (const [troop, { role, b1, b2 }] of Object.entries(roles.troops)) {
+		if (!role || !memberRoles.includes(role)) continue
+		defaults.troop = troop
+		if (b1 && memberRoles.includes(b1)) defaults.bordee = BORDEE.B1
+		else if (b2 && memberRoles.includes(b2)) defaults.bordee = BORDEE.B2
+		break
+	}
+
+	return defaults
 }

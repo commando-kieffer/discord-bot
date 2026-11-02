@@ -42,6 +42,19 @@ describe('définitions des commandes', () => {
 		assert.equal(new Set(keys).size, keys.length)
 	})
 
+	it('Enrôler et Recrutement sont des actions sur un membre', () => {
+		const actions = REGISTERED_COMMANDS.filter((command) => command.type === COMMAND_TYPE.USER).map((command) => command.name)
+		assert.ok(actions.includes('Enrôler'))
+		assert.ok(actions.includes('Recrutement'))
+	})
+
+	it('supprime « Lancer le recrutement » et l\'ancienne commande /recrutement', () => {
+		assert.deepEqual(REMOVED_COMMANDS, [
+			{ name: 'Lancer le recrutement', type: COMMAND_TYPE.USER },
+			{ name: 'recrutement', type: COMMAND_TYPE.CHAT_INPUT },
+		])
+	})
+
 	it('ne supprime pas une commande encore enregistrée', () => {
 		const registered = new Set(REGISTERED_COMMANDS.map((command) => `${command.type}:${command.name}`))
 		for (const command of REMOVED_COMMANDS) {

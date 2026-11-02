@@ -2,6 +2,7 @@ import { InteractionType } from 'discord-interactions'
 import { COMMAND_NAMES } from '../commands/definitions.js'
 import { COMPLAINT_FORM, COMPLAINT_FORM_ID, Fields as ComplaintFields } from '../forms/complaint-form.js'
 import { LINK_FORM_PREFIX, Fields as LinkFields } from '../forms/link-form.js'
+import { CADET_FORM_PREFIX, ENROL_FORM_PREFIX, readRankForm } from '../forms/rank-form.js'
 import {
 	Fields as RecruitmentFields,
 	RECRUITMENT_FORM_1,
@@ -26,8 +27,17 @@ const NO_AUTHORIZATION = "Vous n'avez pas les autorisations nécessaires"
 const respond = (body, status = 200) => ({ status, body })
 const fromResult = ({ status, message }) => respond(reply(message), status)
 
+// Le formulaire à afficher, ou le message qui explique pourquoi il ne s'ouvre pas
+const fromOpenForm = (result) => (result.form ? respond(modal(result.form)) : fromResult(result))
+
 // Valeurs des options d'une commande slash, par nom
 const readOptions = (data) => Object.fromEntries((data.options ?? []).map(({ name, value }) => [name, value]))
+
+// Membre ciblé par une action, tel que Discord le joint à l'interaction (rôles, pseudo, nom d'utilisateur)
+const targetMember = (ctx) => ({
+	...ctx.data.resolved?.members?.[ctx.targetId],
+	user: ctx.data.resolved?.users?.[ctx.targetId],
+})
 
 /**
  * REQUETES AVEC UNE COMMANDE OU UNE ACTION SUR UN COMMANDO
@@ -75,13 +85,6 @@ const buildCommands = ({ config, features }) => {
 			},
 		},
 
-		[COMMAND_NAMES.START_RECRUITMENT]: {
-			access: ROLE.INSTRUCTEURS,
-			denied: NO_PERMISSION,
-			target: true,
-			run: async (ctx) => fromResult(await members.startRecruitment(ctx.userId, ctx.targetId)),
-		},
-
 		[COMMAND_NAMES.CIVILS_NON_VUS]: {
 			access: ROLE.INSTRUCTEURS,
 			denied: "Vous n'avez pas la permission d'exécuter cette commande",
@@ -108,13 +111,18 @@ const buildCommands = ({ config, features }) => {
 			run: async (ctx) => respond(modal(await members.openLinkForm(ctx.targetId))),
 		},
 
+		[COMMAND_NAMES.ENROL]: {
+			access: ROLE.INSTRUCTEURS,
+			denied: NO_PERMISSION,
+			target: true,
+			run: (ctx) => fromOpenForm(recruitment.openEnrolForm(ctx.userId, ctx.targetId, targetMember(ctx))),
+		},
+
 		[COMMAND_NAMES.ASSIGN_INITIAL_ROLES]: {
 			access: ROLE.INSTRUCTEURS,
 			denied: NO_PERMISSION,
-			run: async (ctx) => {
-				const { commando, nom, troop, bordee } = readOptions(ctx.data)
-				return fromResult(await recruitment.assignInitialRoles(ctx.userId, [commando, nom, troop, bordee]))
-			},
+			target: true,
+			run: (ctx) => fromOpenForm(recruitment.openCadetForm(ctx.userId, ctx.targetId, targetMember(ctx))),
 		},
 
 		[COMMAND_NAMES.RECRUITMENT_FORM_1]: {
@@ -180,7 +188,25 @@ const buildForms = ({ features }) => {
 			access: ROLE.INSTRUCTEURS,
 			denied: NO_AUTHORIZATION,
 			run: async (ctx, values, userToLink) =>
-				fromResult(await members.linkCommando(ctx.userId, [userToLink, values[LinkFields.FORUM_ID]])),
+				fromResult(await members.linkAndStartRecruitment(ctx.userId, userToLink, values[LinkFields.FORUM_ID])),
+		},
+		{
+			prefix: ENROL_FORM_PREFIX,
+			access: ROLE.INSTRUCTEURS,
+			denied: NO_PERMISSION,
+			run: async (ctx, values, commando) => {
+				const { nom, troop, bordee } = readRankForm(values)
+				return fromResult(await recruitment.enrolRecruit(ctx.userId, [commando, nom, troop, bordee]))
+			},
+		},
+		{
+			prefix: CADET_FORM_PREFIX,
+			access: ROLE.INSTRUCTEURS,
+			denied: NO_PERMISSION,
+			run: async (ctx, values, commando) => {
+				const { nom, troop, bordee } = readRankForm(values)
+				return fromResult(await recruitment.assignInitialRoles(ctx.userId, [commando, nom, troop, bordee]))
+			},
 		},
 	]
 }

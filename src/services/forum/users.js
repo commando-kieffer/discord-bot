@@ -27,6 +27,17 @@ export function createUsersRepository({ db, logger }) {
 		return 'Les permissions de base ont été correctement attribuées.'
 	}
 
+	// Compte forum lié à un compte Discord, ou null
+	const findLinkedAccount = async (discordId) => {
+		const result = await run('SELECT user_id, username FROM xf_user WHERE discord_id = ? LIMIT 1', [discordId], {
+			onConnectionError: 'Erreur de connexion à la base de données. CODE U14',
+			onError: 'Une erreur est survenue. CODE U29',
+			context: { discordId },
+		})
+
+		return result[0] ?? null
+	}
+
 	const last = async () => {
 		const result = await run('SELECT user_id, username FROM xf_user ORDER BY user_id DESC LIMIT 5', [], {
 			onConnectionError: 'Erreur de connexion à la base de données. CODE U52',
@@ -84,5 +95,5 @@ export function createUsersRepository({ db, logger }) {
 		return result[0] ?? null
 	}
 
-	return { last, info, setRoles, getUsername }
+	return { last, info, setRoles, getUsername, findLinkedAccount }
 }

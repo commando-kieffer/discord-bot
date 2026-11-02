@@ -12,7 +12,7 @@ import {
 	TEST_COMMAND,
 	INFOS_GENERALES_COMMAND,
 	CIVILS_NON_VUS_COMMAND,
-	START_RECRUITMENT_COMMAND,
+	ENROL_COMMAND,
 	PROFILE_COMMAND,
 	GET_USERNAME_COMMAND,
 	COIN_FLIP_COMMAND,
@@ -37,9 +37,9 @@ const HELP_MESSAGE = `
 **__Pour les QM, Instructeurs, Recruteurs__**
 - \`/${CIVILS_NON_VUS_COMMAND.name}\` => ${CIVILS_NON_VUS_COMMAND.description}
 - \`/${LINK_COMMAND.name}\` => ${LINK_COMMAND.description}
-- \`/${ASSIGN_INITIAL_ROLES_COMMAND.name}\` => ${ASSIGN_INITIAL_ROLES_COMMAND.description}
-- [Action] \`${LINK_MODAL_COMMAND.name}\` => ${LINK_COMMAND.description}
-- [Action] \`${START_RECRUITMENT_COMMAND.name}\` => Démarre la phase de recrutement (donne les permissions pour remplir le formulaire de recrutement)
+- [Action] \`${LINK_MODAL_COMMAND.name}\` => ${LINK_COMMAND.description} et démarre la phase de recrutement (donne les permissions pour remplir le formulaire de recrutement)
+- [Action] \`${ENROL_COMMAND.name}\` => Enrôle le membre comme recrue : nom, troop et bordée, sur Discord uniquement
+- [Action] \`${ASSIGN_INITIAL_ROLES_COMMAND.name}\` => Passe la recrue au grade de cadet, sur Discord et sur le forum (le membre doit être lié au forum)
 
 **__Pour l'État-Major__**
 - [Action] \`${FIRE_COMMAND.name}\` => Radiation du membre sélectionné

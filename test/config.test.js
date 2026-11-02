@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { ConfigError, checkForumApiUrl, deepFreeze, listMissingVars, loadConfig } from '../src/config.js'
+import { ConfigError, DEFAULT_RECRUE_ROLE, checkForumApiUrl, deepFreeze, listMissingVars, loadConfig } from '../src/config.js'
 import { ids, testEnv } from './support/fakes.js'
 
 describe('loadConfig', () => {
@@ -25,6 +25,12 @@ describe('loadConfig', () => {
 		assert.equal(config.logLevel, 'info')
 		assert.equal(config.publicUrl, 'https://bot.example.com')
 		assert.equal(config.db.host, 'localhost')
+	})
+
+	it('connaît le rôle Recrue sans qu\'il soit dans le .env', () => {
+		assert.equal(loadConfig(testEnv({ RECRUE_ROLE: undefined })).roles.recrue, DEFAULT_RECRUE_ROLE)
+		assert.equal(DEFAULT_RECRUE_ROLE, '1318565126516772985')
+		assert.equal(loadConfig(testEnv({ RECRUE_ROLE: '300000000000000099' })).roles.recrue, '300000000000000099')
 	})
 
 	it('permet de changer l\'hôte de la base', () => {

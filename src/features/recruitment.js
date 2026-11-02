@@ -1,9 +1,12 @@
+import { buildCadetForm, buildEnrolForm } from '../forms/rank-form.js'
 import {
 	GRADE,
 	NICK_MAX_LENGTH,
 	buildNick,
+	findRankDefaults,
 	getBordeeAlias,
 	getInitialRoles,
+	getRecruitRoles,
 	getTroopDiscordRole,
 	isBordee,
 	isTroop,
@@ -27,6 +30,50 @@ export function createRecruitmentFeature({ discord, forum, config, logger }) {
 		return null
 	}
 
+	// Nom affiché dans le titre du formulaire, pour vérifier qu'on a cliqué sur la bonne personne
+	const displayName = (member) => member?.nick || member?.user?.global_name || member?.user?.username
+
+	const openForm = (requesterId, userId, member, build, verb) => {
+		if (isProtected(userId)) {
+			return { status: 200, message: `**Action prohibée** : <@${requesterId}> a tenté ${verb} <@${userId}>` }
+		}
+		return { form: build(userId, { displayName: displayName(member), ...findRankDefaults(member, roles) }) }
+	}
+
+	// `member` vient des données de l'interaction (rôles et pseudo du membre ciblé) : pas d'appel à Discord
+	const openEnrolForm = (requesterId, userId, member) =>
+		openForm(requesterId, userId, member, buildEnrolForm, "d'enrôler")
+
+	const openCadetForm = (requesterId, userId, member) =>
+		openForm(requesterId, userId, member, buildCadetForm, 'de recruter')
+
+	// Enrôler : la recrue a les rôles Discord d'un cadet (avec le grade de recrue), mais pas encore de compte forum
+	const enrolRecruit = async (requesterId, [commando, nom, troop, bordee]) => {
+		if (isProtected(commando)) {
+			return {
+				status: 200,
+				message: `**Action prohibée** : <@${requesterId}> a tenté d'enrôler <@${commando}>`,
+			}
+		}
+
+		nom = String(nom ?? '').trim()
+		const invalid = checkRankInput(nom, troop, bordee, GRADE.RECRUE)
+		if (invalid) return { status: 200, message: invalid }
+
+		const nick = buildNick(GRADE.RECRUE, nom, troop)
+
+		try {
+			await discord.updateMember(commando, { nick, roles: getRecruitRoles(troop, bordee, roles) })
+		} catch (err) {
+			logger.error('Recrue non enrôlée', { requesterId, commando, error: err })
+			return { status: 200, message: `Le pseudo et les rôles de <@${commando}> n'ont pas pu être modifiés sur Discord.` }
+		}
+
+		logger.info('Recrue enrôlée', { requesterId, commando, nick, troop, bordee })
+
+		return { status: 200, message: `La recrue <@${commando}> est assignée à la ${troop}-${bordee}` }
+	}
+
 	const assignInitialRoles = async (requesterId, [commando, nom, troop, bordee]) => {
 		if (isProtected(commando)) {
 			return {
@@ -42,8 +89,15 @@ export function createRecruitmentFeature({ discord, forum, config, logger }) {
 		const nick = buildNick(GRADE.CADET, nom, troop)
 		const [discordRoles, forumRoles] = getInitialRoles(troop, bordee, { roles, forumGroups })
 
+		// Un cadet a un compte forum : sans lien, on s'arrête avant de toucher à quoi que ce soit
 		let pseudoReq
 		try {
+			if (!(await forum.users.findLinkedAccount(commando))) {
+				return {
+					status: 200,
+					message: `<@${commando}> n'est pas lié au forum. Passez d'abord par « Lier au forum ».`,
+				}
+			}
 			pseudoReq = await forum.users.getUsername(commando)
 		} catch (err) {
 			return { status: 200, message: toUserMessage(err) }
@@ -103,5 +157,13 @@ export function createRecruitmentFeature({ discord, forum, config, logger }) {
 	const recruitmentForm2 = async (requesterId, data) => fromForum(forum.recruitment.part2(requesterId, data))
 	const recruitmentForm3 = async (requesterId, data) => fromForum(forum.recruitment.part3(requesterId, data))
 
-	return { assignInitialRoles, recruitmentForm1, recruitmentForm2, recruitmentForm3 }
+	return {
+		openEnrolForm,
+		openCadetForm,
+		enrolRecruit,
+		assignInitialRoles,
+		recruitmentForm1,
+		recruitmentForm2,
+		recruitmentForm3,
+	}
 }

@@ -83,6 +83,22 @@ describe('recrutement (passage cadet)', () => {
 		assert.equal(callsOf(discord.updateMember)[0][1].nick.length, 32)
 	})
 
+	it('s\'arrête avec un message court si le membre n\'est pas lié au forum', async () => {
+		const { discord, forum, feature } = setup({ users: { findLinkedAccount: async () => null } })
+		const { message } = await feature.assignInitialRoles(ids.requester, [ids.target, 'Kieffer', 't1', 'b1'])
+		assert.equal(message, `<@${ids.target}> n'est pas lié au forum. Passez d'abord par « Lier au forum ».`)
+		assert.deepEqual(callsOf(forum.users.findLinkedAccount), [[ids.target]])
+		assert.equal(forum.users.getUsername.mock.callCount(), 0)
+		assert.equal(discord.updateMember.mock.callCount(), 0)
+	})
+
+	it('s\'arrête si le lien ne peut pas être vérifié', async () => {
+		const { discord, feature } = setup({ users: { findLinkedAccount: fail(new ForumError('Erreur de connexion à la base de données. CODE U14')) } })
+		const { message } = await feature.assignInitialRoles(ids.requester, [ids.target, 'Kieffer', 't1', 'b1'])
+		assert.equal(message, 'Erreur de connexion à la base de données. CODE U14')
+		assert.equal(discord.updateMember.mock.callCount(), 0)
+	})
+
 	it('s\'arrête si la fiche de recrutement est introuvable', async () => {
 		const { discord, feature } = setup({ users: { getUsername: async () => null } })
 		const { message } = await feature.assignInitialRoles(ids.requester, [ids.target, 'Kieffer', 't1', 'b1'])
@@ -120,6 +136,97 @@ describe('recrutement (passage cadet)', () => {
 				"Le forum n'a pas été mis à jour : Aucun compte forum n'est lié à ce compte Discord. CODE U32",
 			].join('\n')
 		)
+	})
+})
+
+describe('enrôler une recrue', () => {
+	it('renomme et donne les rôles Discord de recrue, sans toucher au forum', async () => {
+		const { discord, forum, feature, logger } = setup()
+
+		assert.deepEqual(await feature.enrolRecruit(ids.requester, [ids.target, 'Kieffer', 't9', 'b1']), {
+			status: 200,
+			message: `La recrue <@${ids.target}> est assignée à la t9-b1`,
+		})
+		assert.deepEqual(callsOf(discord.updateMember), [
+			[
+				ids.target,
+				{
+					nick: 'Recrue.Kieffer-KGFsl',
+					roles: [ids.roles.recrue, ids.roles.membreEquipage, ids.roles.t9, ids.roles.t9b1],
+				},
+			],
+		])
+		assert.equal(discord.sendMessage.mock.callCount(), 0)
+		for (const fn of Object.values(forum.users)) assert.equal(fn.mock.callCount(), 0)
+		assert.equal(logger.entries[0].message, 'Recrue enrôlée')
+	})
+
+	it('refuse pour un membre protégé', async () => {
+		const { discord, feature } = setup()
+		assert.equal(
+			(await feature.enrolRecruit(ids.requester, [ids.protected, 'Kieffer', 't1', 'b1'])).message,
+			`**Action prohibée** : <@${ids.requester}> a tenté d'enrôler <@${ids.protected}>`
+		)
+		assert.equal(discord.updateMember.mock.callCount(), 0)
+	})
+
+	it('refuse un nom invalide, une troop ou une bordée manquante', async () => {
+		const { discord, feature } = setup()
+		assert.match((await feature.enrolRecruit(ids.requester, [ids.target, 'K', 't1', 'b1'])).message, /pas un nom de commando valide/)
+		assert.equal((await feature.enrolRecruit(ids.requester, [ids.target, 'Kieffer', undefined, 'b1'])).message, 'Troop ou bordée inconnue.')
+		assert.equal((await feature.enrolRecruit(ids.requester, [ids.target, 'Kieffer', 't1', undefined])).message, 'Troop ou bordée inconnue.')
+		assert.equal(discord.updateMember.mock.callCount(), 0)
+	})
+
+	it('refuse un pseudo de recrue trop long pour Discord', async () => {
+		const { discord, feature } = setup()
+		const { message } = await feature.enrolRecruit(ids.requester, [ids.target, 'Abcdefghijklmnopqrst', 't9', 'b1'])
+		assert.equal(message, 'Le pseudo « Recrue.Abcdefghijklmnopqrst-KGFsl » dépasse les 32 caractères autorisés par Discord.')
+		assert.equal(discord.updateMember.mock.callCount(), 0)
+	})
+
+	it('prévient si Discord refuse', async () => {
+		const { feature, logger } = setup({ discord: { updateMember: fail(new DiscordApiError({ method: 'PATCH', endpoint: 'x', status: 403 })) } })
+		assert.match((await feature.enrolRecruit(ids.requester, [ids.target, 'Kieffer', 't1', 'b1'])).message, /n'ont pas pu être modifiés sur Discord/)
+		assert.equal(logger.entries[0].level, 'error')
+	})
+})
+
+describe('ouverture des formulaires Enrôler et Recrutement', () => {
+	const member = {
+		nick: 'Recrue.Kieffer-8Fsl',
+		roles: [ids.roles.recrue, ids.roles.t8, ids.roles.t8b2],
+		user: { username: 'mozi', global_name: 'Mozi' },
+	}
+
+	it('pré-remplit le formulaire de recrutement avec les infos de la recrue', () => {
+		const { feature } = setup()
+		const { form } = feature.openCadetForm(ids.requester, ids.target, member)
+		assert.equal(form.custom_id, `cadet-form-${ids.target}`)
+		assert.equal(form.title, 'Recrutement de Recrue.Kieffer-8Fsl')
+		assert.equal(form.components[0].component.value, 'Kieffer')
+		assert.equal(form.components[1].component.options.find((option) => option.default).value, 't8')
+		assert.equal(form.components[2].component.options.find((option) => option.default).value, 'b2')
+	})
+
+	it('ouvre le formulaire Enrôler avec le nom d\'affichage du membre', () => {
+		const { feature } = setup()
+		const { form } = feature.openEnrolForm(ids.requester, ids.target, { roles: [], user: { username: 'mozi', global_name: 'Mozi' } })
+		assert.equal(form.custom_id, `enrol-form-${ids.target}`)
+		assert.equal(form.title, 'Enrôler Mozi')
+		assert.equal(form.components[0].component.value, undefined)
+
+		assert.equal(feature.openEnrolForm(ids.requester, ids.target, { user: { username: 'mozi' } }).form.title, 'Enrôler mozi')
+		assert.equal(feature.openEnrolForm(ids.requester, ids.target, undefined).form.title, 'Enrôler')
+	})
+
+	it('refuse d\'ouvrir le formulaire pour un membre protégé', () => {
+		const { feature } = setup()
+		assert.deepEqual(feature.openEnrolForm(ids.requester, ids.protected, member), {
+			status: 200,
+			message: `**Action prohibée** : <@${ids.requester}> a tenté d'enrôler <@${ids.protected}>`,
+		})
+		assert.match(feature.openCadetForm(ids.requester, ids.protected, member).message, /a tenté de recruter/)
 	})
 })
 

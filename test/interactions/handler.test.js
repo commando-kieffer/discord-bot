@@ -40,11 +40,14 @@ const createFakeFeatures = () => ({
 	members: {
 		linkCommando: mock.fn(result('lié')),
 		openLinkForm: mock.fn(async (target) => ({ custom_id: LINK_FORM_PREFIX + target, title: 'Lien', components: [] })),
-		startRecruitment: mock.fn(result('recrutement lancé')),
+		linkAndStartRecruitment: mock.fn(result('lié, recrutement lancé')),
 		fireCommando: mock.fn(result('radié')),
 		displayUnseenCivilians: mock.fn(result('civils')),
 	},
 	recruitment: {
+		openEnrolForm: mock.fn((requester, target) => ({ form: { custom_id: `enrol-form-${target}`, title: 'Enrôler', components: [] } })),
+		openCadetForm: mock.fn((requester, target) => ({ form: { custom_id: `cadet-form-${target}`, title: 'Recrutement', components: [] } })),
+		enrolRecruit: mock.fn(result('enrôlé')),
 		assignInitialRoles: mock.fn(result('assigné')),
 		recruitmentForm1: mock.fn(result('1/3')),
 		recruitmentForm2: mock.fn(result('2/3')),
@@ -251,15 +254,15 @@ describe('interactions : questionnaires de recrutement', () => {
 })
 
 describe('interactions : instructeurs, QM et EM', () => {
-	it('Lier au forum ouvre le formulaire, et son envoi lie les comptes', async () => {
+	it('Lier au forum ouvre le formulaire, et son envoi lie les comptes et lance le recrutement', async () => {
 		const { handle, features } = setup()
 		const response = await handle(command(COMMAND_NAMES.LINK_MODAL, { target_id: ids.target, roles: INSTRUCTEUR }))
 		assert.equal(response.body.type, InteractionResponseType.MODAL)
 		assert.equal(response.body.data.custom_id, LINK_FORM_PREFIX + ids.target)
 
 		const data = replyOf(await handle(submit(LINK_FORM_PREFIX + ids.target, [textRow('forum-id', '7526')], INSTRUCTEUR)))
-		assert.equal(data.content, 'lié')
-		assert.deepEqual(callsOf(features.members.linkCommando), [[ids.requester, [ids.target, '7526']]])
+		assert.equal(data.content, 'lié, recrutement lancé')
+		assert.deepEqual(callsOf(features.members.linkAndStartRecruitment), [[ids.requester, ids.target, '7526']])
 	})
 
 	it('le formulaire de lien refuse un membre invalide ou un envoi non autorisé', async () => {
@@ -269,7 +272,7 @@ describe('interactions : instructeurs, QM et EM', () => {
 			replyOf(await handle(submit(LINK_FORM_PREFIX + ids.target, [textRow('forum-id', '1')], []))).content,
 			"Vous n'avez pas les autorisations nécessaires"
 		)
-		assert.equal(features.members.linkCommando.mock.callCount(), 0)
+		assert.equal(features.members.linkAndStartRecruitment.mock.callCount(), 0)
 	})
 
 	it('/lien lie les comptes à partir des options', async () => {
@@ -282,10 +285,11 @@ describe('interactions : instructeurs, QM et EM', () => {
 		assert.deepEqual(callsOf(features.members.linkCommando), [[ids.requester, [ids.target, 7526]]])
 	})
 
-	it('Lancer le recrutement', async () => {
-		const { handle, features } = setup()
-		await handle(command(COMMAND_NAMES.START_RECRUITMENT, { target_id: ids.target, roles: [ids.roles.recruteur] }))
-		assert.deepEqual(callsOf(features.members.startRecruitment), [[ids.requester, ids.target]])
+	it('« Lancer le recrutement » et /recrutement n\'existent plus', async () => {
+		const { handle } = setup()
+		const old = command('Lancer le recrutement', { target_id: ids.target, roles: INSTRUCTEUR })
+		assert.equal(replyOf(await handle(old)).content, "Cette commande n'existe plus.")
+		assert.equal(replyOf(await handle(command('recrutement', { options: [], roles: INSTRUCTEUR }))).content, "Cette commande n'existe plus.")
 	})
 
 	it('/civils-non-vus', async () => {
@@ -293,16 +297,63 @@ describe('interactions : instructeurs, QM et EM', () => {
 		assert.equal(replyOf(await handle(command(COMMAND_NAMES.CIVILS_NON_VUS, { roles: [ids.roles.qm1] }))).content, 'civils')
 	})
 
-	it('/recrutement lit les options par leur nom', async () => {
+	const resolved = {
+		users: { [ids.target]: { id: ids.target, username: 'mozi' } },
+		members: { [ids.target]: { nick: 'Recrue.Kieffer-8Fsl', roles: [ids.roles.recrue] } },
+	}
+
+	const rankForm = (nom, troop, bordee) => [
+		{ type: 18, component: { type: 4, custom_id: 'commando_name', value: nom } },
+		{ type: 18, component: { type: 3, custom_id: 'troop', values: [troop] } },
+		{ type: 18, component: { type: 3, custom_id: 'bordee', values: [bordee] } },
+	]
+
+	it('Enrôler ouvre le formulaire avec le membre ciblé, et son envoi enrôle la recrue', async () => {
 		const { handle, features } = setup()
-		const options = [
-			{ name: 'troop', value: 't8' },
-			{ name: 'commando', value: ids.target },
-			{ name: 'bordee', value: 'b2' },
-			{ name: 'nom', value: 'Kieffer' },
-		]
-		await handle(command(COMMAND_NAMES.ASSIGN_INITIAL_ROLES, { options, roles: INSTRUCTEUR }))
-		assert.deepEqual(callsOf(features.recruitment.assignInitialRoles), [[ids.requester, [ids.target, 'Kieffer', 't8', 'b2']]])
+		const response = await handle(command(COMMAND_NAMES.ENROL, { target_id: ids.target, resolved, roles: [ids.roles.recruteur] }))
+		assert.equal(response.body.type, InteractionResponseType.MODAL)
+		assert.equal(response.body.data.custom_id, `enrol-form-${ids.target}`)
+		assert.deepEqual(callsOf(features.recruitment.openEnrolForm), [
+			[ids.requester, ids.target, { nick: 'Recrue.Kieffer-8Fsl', roles: [ids.roles.recrue], user: { id: ids.target, username: 'mozi' } }],
+		])
+
+		const data = replyOf(await handle(submit(`enrol-form-${ids.target}`, rankForm('Kieffer', 't8', 'b2'), INSTRUCTEUR)))
+		assert.equal(data.content, 'enrôlé')
+		assert.deepEqual(callsOf(features.recruitment.enrolRecruit), [[ids.requester, [ids.target, 'Kieffer', 't8', 'b2']]])
+	})
+
+	it('Recrutement ouvre le formulaire pré-rempli, et son envoi fait passer la recrue cadet', async () => {
+		const { handle, features } = setup()
+		const response = await handle(command(COMMAND_NAMES.ASSIGN_INITIAL_ROLES, { target_id: ids.target, resolved, roles: [ids.roles.qm2] }))
+		assert.equal(response.body.data.custom_id, `cadet-form-${ids.target}`)
+		assert.equal(callsOf(features.recruitment.openCadetForm)[0][2].nick, 'Recrue.Kieffer-8Fsl')
+
+		replyOf(await handle(submit(`cadet-form-${ids.target}`, rankForm('Kieffer', 't1', 'b1'), EM)))
+		assert.deepEqual(callsOf(features.recruitment.assignInitialRoles), [[ids.requester, [ids.target, 'Kieffer', 't1', 'b1']]])
+	})
+
+	it('affiche le refus au lieu du formulaire (membre protégé)', async () => {
+		const { handle, features } = setup()
+		features.recruitment.openCadetForm.mock.mockImplementation(() => ({ status: 200, message: '**Action prohibée**' }))
+		const response = await handle(command(COMMAND_NAMES.ASSIGN_INITIAL_ROLES, { target_id: ids.protected, roles: EM }))
+		assert.equal(replyOf(response).content, '**Action prohibée**')
+	})
+
+	it('Enrôler fonctionne sans données sur le membre ciblé', async () => {
+		const { handle, features } = setup()
+		await handle(command(COMMAND_NAMES.ENROL, { target_id: ids.target, roles: INSTRUCTEUR }))
+		assert.deepEqual(callsOf(features.recruitment.openEnrolForm)[0][2], { user: undefined })
+	})
+
+	it('les formulaires Enrôler et Recrutement vérifient les droits et le membre à l\'envoi', async () => {
+		const { handle, features } = setup()
+		const cadet = [ids.roles.cadet]
+		const denied = "Vous n'avez pas la permission d'éxécuter cette commande."
+		assert.equal(replyOf(await handle(submit(`enrol-form-${ids.target}`, rankForm('Kieffer', 't1', 'b1'), cadet))).content, denied)
+		assert.equal(replyOf(await handle(submit(`cadet-form-${ids.target}`, rankForm('Kieffer', 't1', 'b1'), cadet))).content, denied)
+		assert.equal(replyOf(await handle(submit('cadet-form-12', rankForm('Kieffer', 't1', 'b1'), EM))).content, UNKNOWN_MEMBER_MESSAGE)
+		assert.equal(features.recruitment.enrolRecruit.mock.callCount(), 0)
+		assert.equal(features.recruitment.assignInitialRoles.mock.callCount(), 0)
 	})
 
 	it('Radier est réservé à l\'État-Major', async () => {
@@ -321,14 +372,14 @@ describe('interactions : instructeurs, QM et EM', () => {
 		const cases = [
 			[command(COMMAND_NAMES.LINK_MODAL, { target_id: ids.target, roles: cadet }), "Vous n'avez pas les autorisations nécessaires"],
 			[command(COMMAND_NAMES.LINK, { options: [], roles: cadet }), "Vous n'avez pas les autorisations nécessaires"],
-			[command(COMMAND_NAMES.START_RECRUITMENT, { target_id: ids.target, roles: cadet }), "Vous n'avez pas la permission d'éxécuter cette commande."],
 			[command(COMMAND_NAMES.CIVILS_NON_VUS, { roles: cadet }), "Vous n'avez pas la permission d'exécuter cette commande"],
-			[command(COMMAND_NAMES.ASSIGN_INITIAL_ROLES, { options: [], roles: cadet }), "Vous n'avez pas la permission d'éxécuter cette commande."],
+			[command(COMMAND_NAMES.ENROL, { target_id: ids.target, roles: cadet }), "Vous n'avez pas la permission d'éxécuter cette commande."],
+			[command(COMMAND_NAMES.ASSIGN_INITIAL_ROLES, { target_id: ids.target, roles: cadet }), "Vous n'avez pas la permission d'éxécuter cette commande."],
 		]
 		for (const [interaction, expected] of cases) {
 			assert.equal(replyOf(await handle(interaction)).content, expected)
 		}
-		for (const fn of [...Object.values(features.members), features.recruitment.assignInitialRoles]) {
+		for (const fn of [...Object.values(features.members), ...Object.values(features.recruitment)]) {
 			assert.equal(fn.mock.callCount(), 0)
 		}
 		assert.equal(logger.entries.filter((entry) => entry.message === 'Accès refusé').length, cases.length)
