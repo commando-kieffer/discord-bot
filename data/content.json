@@ -1,9 +1,8 @@
 {
-	"game": "Battlefield 6",
+	"game": "Arma Reforger",
 	"links": {
-		"forumProfile": "https://forum.commandokieffer.com/index.php?members/{userId}",
-		"medals": "https://commandokieffer.com/decorations",
-		"pointsRanking": "https://commandokieffer.com/points"
+		"zeusProfile": "https://zeus.commandokieffer.com/profil/{userId}",
+		"pointsRanking": "https://zeus.commandokieffer.com/classements?ranking=points"
 	},
 	"websites": [
 		{

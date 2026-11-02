@@ -5,7 +5,7 @@ import { loadContent } from '../../src/content.js'
 import { createInfoFeature } from '../../src/features/info.js'
 
 const content = {
-	game: 'Battlefield 6',
+	game: 'Arma Reforger',
 	links: {},
 	websites: [
 		{

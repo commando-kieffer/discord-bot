@@ -24,7 +24,7 @@ const setup = (script, xenforo = {}) => {
 			return xenforo.thread ?? { thread_id: 321, user_id: 7526, view_url: 'https://forum/threads/321/' }
 		},
 	}
-	const repo = createRecruitmentRepository({ db, xenforo: fakeXenforo, logger, game: 'Battlefield 6', now: () => NOW })
+	const repo = createRecruitmentRepository({ db, xenforo: fakeXenforo, logger, game: 'Arma Reforger', now: () => NOW })
 	return { db, logger, repo, threads: calls }
 }
 
@@ -175,7 +175,7 @@ describe('questionnaire 3/3', () => {
 		assert.equal(thread.sticky, false)
 		assert.equal(thread.discussion_open, true)
 		assert.equal(thread.title, '[KIEFFER - EN FORMATION]')
-		assert.equal(thread.message, buildMessage(record, { game: 'Battlefield 6', date: NOW }))
+		assert.equal(thread.message, buildMessage(record, { game: 'Arma Reforger', date: NOW }))
 	})
 
 	it('refuse si le formulaire a déjà été rempli', async () => {
@@ -261,10 +261,10 @@ describe('message de la fiche', () => {
 				how_know_us: 'Un ami',
 				comment: 'Rien',
 			},
-			{ game: 'Battlefield 6', date: NOW }
+			{ game: 'Arma Reforger', date: NOW }
 		)
 
-		assert.match(message, /^\[HEADING=2\]\[u\]QUESTIONNAIRE POUR BATTLEFIELD 6\[\/u\]\[\/HEADING\]/)
+		assert.match(message, /^\[HEADING=2\]\[u\]QUESTIONNAIRE POUR ARMA REFORGER\[\/u\]\[\/HEADING\]/)
 		assert.ok(message.includes(`[b]Date de votre arrivée dans le CK[/b] : ${NOW.toLocaleDateString('fr')}`))
 		assert.ok(message.includes('[b]Programmation[/b] : Oui'))
 		assert.ok(message.includes('[b]Design[/b] : Non'))

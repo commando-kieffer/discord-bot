@@ -6,9 +6,8 @@ import { createFakeForum, createTestLogger, ids } from '../support/fakes.js'
 
 const content = {
 	links: {
-		forumProfile: 'https://forum.commandokieffer.com/index.php?members/{userId}',
-		medals: 'https://commandokieffer.com/decorations',
-		pointsRanking: 'https://commandokieffer.com/points',
+		zeusProfile: 'https://zeus.commandokieffer.com/profil/{userId}',
+		pointsRanking: 'https://zeus.commandokieffer.com/classements?ranking=points',
 	},
 }
 
@@ -38,9 +37,14 @@ describe('profil', () => {
 		assert.equal(status, 200)
 		assert.deepEqual(forum.users.info.mock.calls[0].arguments, [ids.requester])
 		assert.ok(message.includes(`<@${ids.requester}>, voici le résumé de votre profil :`))
-		assert.ok(message.includes('Votre profil forum : https://forum.commandokieffer.com/index.php?members/33.'))
-		assert.ok(message.includes('**12 médailles**. Pour voir lesquelles, rendez-vous ici : https://commandokieffer.com/decorations'))
-		assert.ok(message.includes('**480 points**. Vous avez dépassé la moyenne ! Pour voir le classement, c\'est ici : https://commandokieffer.com/points'))
+		assert.ok(message.includes('Votre profil Zeus : https://zeus.commandokieffer.com/profil/33.'))
+		assert.ok(message.includes('**12 médailles**. Pour voir lesquelles, rendez-vous sur votre profil Zeus.\n'))
+		assert.ok(
+			message.includes(
+				"**480 points**. Vous avez dépassé la moyenne ! Pour voir le classement, c'est ici : https://zeus.commandokieffer.com/classements?ranking=points"
+			)
+		)
+		assert.doesNotMatch(message, /forum\.commandokieffer\.com|commandokieffer\.com\/decorations/)
 		assert.ok(message.includes('présent à **30 missions** du vendredi et en avez manqué **10**, ce qui fait un taux de présence de **75.0%**'))
 		assert.ok(message.includes('**400 jours** que vous êtes dans le commando Kieffer, soit depuis environ 1 an.'))
 	})

@@ -24,8 +24,7 @@ export function loadContent(path = CONTENT_PATH) {
 
 // Liens utilisés par le code, avec les valeurs à remplacer dans chacun
 export const REQUIRED_LINKS = {
-	forumProfile: ['userId'],
-	medals: [],
+	zeusProfile: ['userId'],
 	pointsRanking: [],
 }
 

@@ -61,8 +61,8 @@ export function createProfileFeature({ forum, content, logger, now = () => new D
 		const message = `
 <@${requesterId}>, voici le résumé de votre profil :
 
-Votre profil forum : ${fillTemplate(content.links.forumProfile, { userId: data.user_id })}.
-Vous avez accumulé un total de **${data.medals_count} médailles**. Pour voir lesquelles, rendez-vous ici : ${content.links.medals}
+Votre profil Zeus : ${fillTemplate(content.links.zeusProfile, { userId: data.user_id })}.
+Vous avez accumulé un total de **${data.medals_count} médailles**. Pour voir lesquelles, rendez-vous sur votre profil Zeus.
 Vous avez un total de **${data.panel_pts} points**. ${pointsRemark(data.panel_pts)} Pour voir le classement, c'est ici : ${content.links.pointsRanking}
 Vous avez été présent à **${data.panel_prs} missions** du vendredi et en avez manqué **${data.panel_abs}**, ce qui fait un taux de présence de **${presenceRate(data.panel_prs, data.panel_abs)}%**.
 Cela fait maintenant **${Math.floor((today - data.register_date) / DAY)} jours** que vous êtes dans le commando Kieffer, soit depuis ${formatDistance(data.register_date, today, { locale: fr })}.

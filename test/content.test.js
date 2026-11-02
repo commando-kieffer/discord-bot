@@ -6,7 +6,7 @@ import { after, describe, it } from 'node:test'
 import { ContentError, REQUIRED_LINKS, fillTemplate, loadContent, validateContent } from '../src/content.js'
 
 const validContent = () => ({
-	game: 'Battlefield 6',
+	game: 'Arma Reforger',
 	links: Object.fromEntries(
 		Object.entries(REQUIRED_LINKS).map(([name, placeholders]) => [
 			name,
@@ -42,7 +42,7 @@ describe('loadContent', () => {
 	it('accepte un fichier enregistré avec un BOM', () => {
 		const path = join(dir, 'bom.json')
 		writeFileSync(path, '﻿' + JSON.stringify(validContent()))
-		assert.equal(loadContent(path).game, 'Battlefield 6')
+		assert.equal(loadContent(path).game, 'Arma Reforger')
 	})
 
 	it('signale un JSON invalide', () => {
@@ -58,7 +58,7 @@ describe('loadContent', () => {
 
 describe('validateContent', () => {
 	it('accepte un contenu complet', () => {
-		assert.equal(validateContent(validContent()).game, 'Battlefield 6')
+		assert.equal(validateContent(validContent()).game, 'Arma Reforger')
 	})
 
 	it('liste tous les problèmes trouvés', () => {
