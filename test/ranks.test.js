@@ -4,6 +4,7 @@ import {
 	BORDEE,
 	BORDEE_LABELS,
 	GRADE,
+	STAGE,
 	TROOP,
 	TROOP_LABELS,
 	buildFormerNick,
@@ -13,6 +14,7 @@ import {
 	getBordeeAlias,
 	getInitialRoles,
 	getRecruitRoles,
+	getStage,
 	getUnitRoles,
 	getTroopAlias,
 	getTroopDiscordRole,
@@ -153,6 +155,42 @@ describe('rôles', () => {
 			assert.ok(!unitRoles.includes(role), role)
 		}
 		assert.ok(!getUnitRoles({ ...config.roles, em: undefined }).includes(undefined))
+	})
+})
+
+describe('stade d\'un membre', () => {
+	const stageOf = (...memberRoles) => getStage(memberRoles, config.roles)
+
+	it('un membre sans rôle du CK est un civil', () => {
+		assert.equal(stageOf(), STAGE.CIVIL)
+		assert.equal(stageOf(ids.roles.civilEnAttente), STAGE.CIVIL)
+		assert.equal(stageOf(ids.roles.civil, ids.roles.recruiting, ids.roles.ancienCommando), STAGE.CIVIL)
+		assert.equal(stageOf('300000000000000999'), STAGE.CIVIL)
+		assert.equal(getStage(undefined, config.roles), STAGE.CIVIL)
+	})
+
+	it('une recrue a le rôle Recrue, avec ou sans ses rôles d\'équipage et de troop', () => {
+		assert.equal(stageOf(ids.roles.recrue), STAGE.RECRUE)
+		assert.equal(stageOf(ids.roles.recrue, ids.roles.membreEquipage, ids.roles.t8, ids.roles.t8b2), STAGE.RECRUE)
+		// avec le rôle de recrutement ajouté par « Lier au forum »
+		assert.equal(stageOf(ids.roles.recrue, ids.roles.membreEquipage, ids.roles.recruiting), STAGE.RECRUE)
+	})
+
+	it('un cadet ou plus est un membre, même s\'il a gardé le rôle Recrue', () => {
+		for (const role of [ids.roles.cadet, ids.roles.instructeur, ids.roles.recruteur, ids.roles.qm1, ids.roles.qm2, ids.roles.em]) {
+			assert.equal(stageOf(role), STAGE.MEMBER, role)
+			assert.equal(stageOf(ids.roles.recrue, role), STAGE.MEMBER, role)
+		}
+	})
+
+	it('l\'équipage ou une troop sans le rôle Recrue, c\'est un ancien déjà dans le CK', () => {
+		assert.equal(stageOf(ids.roles.membreEquipage), STAGE.MEMBER)
+		assert.equal(stageOf(ids.roles.t1b1), STAGE.MEMBER)
+	})
+
+	it('ignore un rôle non configuré', () => {
+		const roles = { ...config.roles, recrue: undefined, cadet: undefined }
+		assert.equal(getStage([undefined, ''], roles), STAGE.CIVIL)
 	})
 })
 

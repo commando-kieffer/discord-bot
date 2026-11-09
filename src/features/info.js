@@ -37,9 +37,9 @@ const HELP_MESSAGE = `
 **__Pour les QM, Instructeurs, Recruteurs__**
 - \`/${CIVILS_NON_VUS_COMMAND.name}\` => ${CIVILS_NON_VUS_COMMAND.description}
 - \`/${LINK_COMMAND.name}\` => ${LINK_COMMAND.description}
-- [Action] \`${LINK_MODAL_COMMAND.name}\` => ${LINK_COMMAND.description} et démarre la phase de recrutement (donne les permissions pour remplir le formulaire de recrutement)
-- [Action] \`${ENROL_COMMAND.name}\` => Enrôle le membre comme recrue : nom, troop et bordée, sur Discord uniquement
-- [Action] \`${ASSIGN_INITIAL_ROLES_COMMAND.name}\` => Passe la recrue au grade de cadet, sur Discord et sur le forum (le membre doit être lié au forum)
+- [Action] \`${ENROL_COMMAND.name}\` => Enrôle un civil comme recrue : nom, troop et bordée, sur Discord uniquement
+- [Action] \`${LINK_MODAL_COMMAND.name}\` => Pour une recrue qui a créé son compte forum : ${LINK_COMMAND.description.toLowerCase()} et démarre la phase de recrutement (donne les permissions pour remplir le formulaire de recrutement)
+- [Action] \`${ASSIGN_INITIAL_ROLES_COMMAND.name}\` => Passe la recrue au grade de cadet, sur Discord et sur le forum (elle doit être liée au forum)
 
 **__Pour l'État-Major__**
 - [Action] \`${FIRE_COMMAND.name}\` => Radiation du membre sélectionné

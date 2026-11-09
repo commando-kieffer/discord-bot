@@ -29,8 +29,9 @@ celles listées dans `REMOVED_COMMANDS` (`src/commands/definitions.js`).
 ## Forum
 
 Les comptes XenForo (pseudo, groupe principal, groupes secondaires) sont modifiés via l'API REST du forum,
-au nom du compte administrateur `CK_FORUM_API_USER` (8, « Commando Kieffer », par défaut) : XenForo
-recalcule les permissions et applique ses propres règles (pseudo unique, super-administrateurs protégés...).
+au nom du compte `CK_FORUM_API_USER` (33, Ohliger, par défaut), qui doit être administrateur : XenForo
+recalcule les permissions et applique ses propres règles (pseudo unique...). Ce compte étant super-administrateur,
+XenForo ne protège pas les autres super-administrateurs.
 Les fiches de recrutement sont postées au nom de la recrue.
 
 La base de données reste utilisée pour ce que l'API ne connaît pas : la colonne `xf_user.discord_id`, les

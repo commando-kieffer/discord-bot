@@ -130,6 +130,24 @@ export const getUnitRoles = (roles) =>
 		...Object.values(roles.troops).flatMap(({ role, b1, b2 }) => [role, b1, b2]),
 	].filter(Boolean)
 
+// Où en est un membre : civil, recrue (en test) ou déjà cadet ou plus
+export const STAGE = {
+	CIVIL: 'civil',
+	RECRUE: 'recrue',
+	MEMBER: 'member',
+}
+
+export const getStage = (memberRoles, roles) => {
+	const has = (role) => Boolean(role) && (memberRoles ?? []).includes(role)
+
+	// Une recrue a les rôles d'équipage et de troop, mais aucun de ceux-ci
+	if ([roles.cadet, roles.instructeur, roles.recruteur, roles.qm1, roles.qm2, roles.em].some(has)) return STAGE.MEMBER
+	if (has(roles.recrue)) return STAGE.RECRUE
+	if (getUnitRoles(roles).some(has)) return STAGE.MEMBER
+
+	return STAGE.CIVIL
+}
+
 // Valeurs déjà connues d'un membre (pseudo et rôles), pour pré-remplir les formulaires
 export const findRankDefaults = (member, roles) => {
 	const memberRoles = member?.roles ?? []

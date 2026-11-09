@@ -108,7 +108,7 @@ const buildCommands = ({ config, features }) => {
 			access: ROLE.INSTRUCTEURS,
 			denied: NO_AUTHORIZATION,
 			target: true,
-			run: async (ctx) => respond(modal(await members.openLinkForm(ctx.targetId))),
+			run: async (ctx) => fromOpenForm(await members.openLinkForm(ctx.userId, ctx.targetId, targetMember(ctx))),
 		},
 
 		[COMMAND_NAMES.ENROL]: {

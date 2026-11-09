@@ -29,7 +29,7 @@ const select = (customId, placeholder, labels, selected) => ({
 	})),
 })
 
-const title = (prefix, displayName) => (displayName ? `${prefix} ${displayName}` : prefix).slice(0, TITLE_MAX_LENGTH)
+const title = (prefix, displayName) => (displayName ? `${prefix} : ${displayName}` : prefix).slice(0, TITLE_MAX_LENGTH)
 
 // Nom, troop et bordée, pré-remplis avec ce qu'on sait déjà du membre
 const buildRankForm = (customId, formTitle, defaults = {}) => ({
@@ -64,10 +64,10 @@ const buildRankForm = (customId, formTitle, defaults = {}) => ({
 })
 
 export const buildEnrolForm = (userId, { displayName, ...defaults } = {}) =>
-	buildRankForm(ENROL_FORM_PREFIX + userId, title('Enrôler', displayName), defaults)
+	buildRankForm(ENROL_FORM_PREFIX + userId, title('Enrôler en recrue', displayName), defaults)
 
 export const buildCadetForm = (userId, { displayName, ...defaults } = {}) =>
-	buildRankForm(CADET_FORM_PREFIX + userId, title('Recrutement de', displayName), defaults)
+	buildRankForm(CADET_FORM_PREFIX + userId, title('Recruter en cadet', displayName), defaults)
 
 // Le nom arrive en texte, la troop et la bordée en listes d'une seule valeur
 const first = (value) => (Array.isArray(value) ? value[0] : value)

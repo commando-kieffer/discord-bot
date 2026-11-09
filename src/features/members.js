@@ -1,9 +1,10 @@
 import { subDays, isBefore } from 'date-fns'
 import { buildLinkForm } from '../forms/link-form.js'
-import { buildFormerNick, extractCommandoName, getUnitRoles } from '../ranks.js'
+import { STAGE, buildFormerNick, extractCommandoName, getStage } from '../ranks.js'
 import { isProtected } from '../security/protected-members.js'
 import { isSnowflake, parseForumId } from '../security/validation.js'
 import { toUserMessage } from '../services/forum/errors.js'
+import { checkStage } from './stages.js'
 
 export function createMembersFeature({ discord, forum, config, logger, now = () => new Date() }) {
 	const { roles, forumGroups } = config
@@ -25,18 +26,30 @@ export function createMembersFeature({ discord, forum, config, logger, now = () 
 		}
 	}
 
-	// Formulaire de « Lier au forum », avec les derniers inscrits du forum pour retrouver l'ID facilement
-	const openLinkForm = async (userToLink) => {
+	// Formulaire de « Lier au forum », avec les derniers inscrits du forum pour retrouver l'ID facilement.
+	// `member` vient des données de l'interaction (rôles du membre ciblé) : seule une recrue peut être liée.
+	const openLinkForm = async (requesterId, userToLink, member) => {
+		if (isProtected(userToLink)) {
+			return {
+				status: 200,
+				message: `**Action prohibée** : <@${requesterId}> a tenté de lancer le recrutement de <@${userToLink}>`,
+			}
+		}
+
+		const refusal = checkStage(STAGE.RECRUE, getStage(member?.roles, roles), userToLink)
+		if (refusal) return { status: 200, message: refusal }
+
 		let lastUsers = []
 		try {
 			lastUsers = await forum.users.last()
 		} catch {
 			// L'erreur est déjà loguée : le formulaire s'ouvre quand même, sans la liste
 		}
-		return buildLinkForm(userToLink, lastUsers)
+		return { form: buildLinkForm(userToLink, lastUsers) }
 	}
 
-	// « Lier au forum » : lie les comptes, puis donne le rôle de civil en recrutement (accès aux questionnaires)
+	// « Lier au forum » : pour une recrue qui a créé son compte forum. Lie les comptes, puis donne le rôle
+	// de civil en recrutement (accès aux questionnaires)
 	const linkAndStartRecruitment = async (requesterId, userId, idForum) => {
 		if (isProtected(userId)) {
 			return {
@@ -49,6 +62,19 @@ export function createMembersFeature({ discord, forum, config, logger, now = () 
 		if (!forumId) {
 			return { status: 200, message: `L'ID forum doit être un nombre (reçu : ${String(idForum ?? '').slice(0, 20)}).` }
 		}
+
+		// Les rôles sont relus sur Discord avant de lier quoi que ce soit : seule une recrue peut être liée au forum
+		let member
+		try {
+			member = await discord.getMember(userId)
+		} catch (err) {
+			logger.error('Membre introuvable pour le recrutement', { requesterId, userId, error: err })
+			return { status: 200, message: `Impossible de vérifier les rôles de <@${userId}> : rien n'a été modifié.` }
+		}
+
+		const memberRoles = member.roles ?? []
+		const refusal = checkStage(STAGE.RECRUE, getStage(memberRoles, roles), userId)
+		if (refusal) return { status: 200, message: refusal }
 
 		let created
 		try {
@@ -67,24 +93,14 @@ export function createMembersFeature({ discord, forum, config, logger, now = () 
 		]
 		const done = () => ({ status: 200, message: lines.join('\n') })
 
-		let member
-		try {
-			member = await discord.getMember(userId)
-		} catch (err) {
-			logger.error('Membre introuvable pour le recrutement', { requesterId, userId, error: err })
-			lines.push(`Impossible de vérifier ses rôles Discord : le recrutement n'a pas été lancé.`)
+		if (memberRoles.includes(roles.recruiting)) {
+			lines.push(`Le recrutement de <@${userId}> était déjà lancé.`)
 			return done()
 		}
 
-		// Les rôles sont remplacés : on ne le fait pas pour quelqu'un qui fait déjà partie du CK
-		const unitRoles = getUnitRoles(roles)
-		if ((member.roles ?? []).some((role) => unitRoles.includes(role))) {
-			lines.push(`Ses rôles n'ont pas été changés : <@${userId}> fait déjà partie du CK.`)
-			return done()
-		}
-
+		// La recrue garde tous ses rôles (troop, bordée...), on ajoute seulement celui qui donne accès aux questionnaires
 		try {
-			await discord.updateMember(userId, { roles: [roles.recruiting] })
+			await discord.updateMember(userId, { roles: [...memberRoles, roles.recruiting] })
 			logger.info('Recrutement lancé', { requesterId, userId })
 			lines.push(`Démarrage du recrutement de <@${userId}>`)
 		} catch (err) {

@@ -17,8 +17,8 @@ export const COMMAND_NAMES = {
   FIRE: 'Radier',
 
   // Pour mettre les droits initiaux
-  ENROL: 'Enrôler',
-  ASSIGN_INITIAL_ROLES: 'Recrutement',
+  ENROL: 'Enrôler (recrue)',
+  ASSIGN_INITIAL_ROLES: 'Recruter (cadet)',
 
   // Pour questionnaires de recrutement
   RECRUITMENT_FORM_1: 'questionnaire-1',
@@ -183,6 +183,9 @@ export const REGISTERED_COMMANDS = [
 export const REMOVED_COMMANDS = [
   // remplacée par « Lier au forum », qui lance aussi le recrutement
   { name: 'Lancer le recrutement', type: COMMAND_TYPE.USER },
-  // remplacée par l'action « Recrutement », avec un formulaire
+  // remplacée par l'action « Recruter (cadet) », avec un formulaire
   { name: 'recrutement', type: COMMAND_TYPE.CHAT_INPUT },
+  // renommées pour qu'on voie laquelle est pour la recrue et laquelle pour le cadet
+  { name: 'Enrôler', type: COMMAND_TYPE.USER },
+  { name: 'Recrutement', type: COMMAND_TYPE.USER },
 ]

@@ -33,10 +33,10 @@ describe('loadConfig', () => {
 		assert.equal(loadConfig(testEnv({ RECRUE_ROLE: '300000000000000099' })).roles.recrue, '300000000000000099')
 	})
 
-	it('agit sur le forum au nom du compte Commando Kieffer par défaut', () => {
+	it('agit sur le forum au nom du compte 33 par défaut', () => {
 		assert.equal(loadConfig(testEnv()).forum.apiUser, DEFAULT_FORUM_API_USER)
-		assert.equal(DEFAULT_FORUM_API_USER, '8')
-		assert.equal(loadConfig(testEnv({ CK_FORUM_API_USER: '33' })).forum.apiUser, '33')
+		assert.equal(DEFAULT_FORUM_API_USER, '33')
+		assert.equal(loadConfig(testEnv({ CK_FORUM_API_USER: '8' })).forum.apiUser, '8')
 		assert.throws(() => loadConfig(testEnv({ CK_FORUM_API_USER: '8; DROP' })), /CK_FORUM_API_USER/)
 	})
 

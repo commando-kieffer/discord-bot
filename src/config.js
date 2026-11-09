@@ -30,8 +30,8 @@ const EXPECTED_VARS = [
 // Rôle « Recrue » du serveur, ajouté après les autres : la valeur par défaut évite de devoir modifier les .env existants
 export const DEFAULT_RECRUE_ROLE = '1318565126516772985'
 
-// Compte forum « Commando Kieffer » (administrateur) au nom duquel le bot modifie les comptes, le même que Zeus
-export const DEFAULT_FORUM_API_USER = '8'
+// Compte forum (super-administrateur, Ohliger) au nom duquel le bot modifie les comptes :
+export const DEFAULT_FORUM_API_USER = '33'
 
 // Le forum de test tourne sous WAMP sans certificat : c'est le seul cas où l'API peut être appelée en http
 const HTTP_FORUM_HOSTS = ['forum.commandokieffer.ch', 'localhost', '127.0.0.1']

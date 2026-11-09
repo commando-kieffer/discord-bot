@@ -42,16 +42,22 @@ describe('définitions des commandes', () => {
 		assert.equal(new Set(keys).size, keys.length)
 	})
 
-	it('Enrôler et Recrutement sont des actions sur un membre', () => {
+	it('Enrôler (recrue) et Recruter (cadet) sont des actions sur un membre', () => {
 		const actions = REGISTERED_COMMANDS.filter((command) => command.type === COMMAND_TYPE.USER).map((command) => command.name)
-		assert.ok(actions.includes('Enrôler'))
-		assert.ok(actions.includes('Recrutement'))
+		assert.ok(actions.includes('Enrôler (recrue)'))
+		assert.ok(actions.includes('Recruter (cadet)'))
 	})
 
-	it('supprime « Lancer le recrutement » et l\'ancienne commande /recrutement', () => {
+	it('les noms d\'actions respectent la limite de 32 caractères de Discord', () => {
+		for (const command of REGISTERED_COMMANDS) assert.ok(command.name.length <= 32, command.name)
+	})
+
+	it('supprime les anciennes commandes de recrutement', () => {
 		assert.deepEqual(REMOVED_COMMANDS, [
 			{ name: 'Lancer le recrutement', type: COMMAND_TYPE.USER },
 			{ name: 'recrutement', type: COMMAND_TYPE.CHAT_INPUT },
+			{ name: 'Enrôler', type: COMMAND_TYPE.USER },
+			{ name: 'Recrutement', type: COMMAND_TYPE.USER },
 		])
 	})
 

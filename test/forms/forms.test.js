@@ -22,12 +22,12 @@ const assertValidModal = (form) => {
 	assert.ok(form.components.length >= 1 && form.components.length <= 5)
 }
 
-describe('formulaires Enrôler et Recrutement', () => {
+describe('formulaires Enrôler (recrue) et Recruter (cadet)', () => {
 	it('demandent le nom, la troop et la bordée dans des labels', () => {
 		const form = buildEnrolForm(ids.target)
 		assertValidModal(form)
 		assert.equal(form.custom_id, ENROL_FORM_PREFIX + ids.target)
-		assert.equal(form.title, 'Enrôler')
+		assert.equal(form.title, 'Enrôler en recrue')
 		assert.deepEqual(
 			form.components.map((row) => [row.type, row.label, row.component.type, row.component.custom_id]),
 			[
@@ -57,7 +57,7 @@ describe('formulaires Enrôler et Recrutement', () => {
 	it('sont pré-remplis avec ce qu\'on sait du membre', () => {
 		const form = buildCadetForm(ids.target, { displayName: 'Recrue.Kieffer-8Fsl', name: 'Kieffer', troop: 't8', bordee: 'b2' })
 		assert.equal(form.custom_id, CADET_FORM_PREFIX + ids.target)
-		assert.equal(form.title, 'Recrutement de Recrue.Kieffer-8Fsl')
+		assert.equal(form.title, 'Recruter en cadet : Recrue.Kieffer-8Fsl')
 		const [name, troop, bordee] = form.components
 		assert.equal(name.component.value, 'Kieffer')
 		assert.deepEqual(

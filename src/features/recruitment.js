@@ -2,11 +2,13 @@ import { buildCadetForm, buildEnrolForm } from '../forms/rank-form.js'
 import {
 	GRADE,
 	NICK_MAX_LENGTH,
+	STAGE,
 	buildNick,
 	findRankDefaults,
 	getBordeeAlias,
 	getInitialRoles,
 	getRecruitRoles,
+	getStage,
 	getTroopDiscordRole,
 	isBordee,
 	isTroop,
@@ -14,6 +16,7 @@ import {
 } from '../ranks.js'
 import { isProtected } from '../security/protected-members.js'
 import { toUserMessage } from '../services/forum/errors.js'
+import { checkStage } from './stages.js'
 
 export function createRecruitmentFeature({ discord, forum, config, logger }) {
 	const { roles, forumGroups } = config
@@ -33,19 +36,37 @@ export function createRecruitmentFeature({ discord, forum, config, logger }) {
 	// Nom affiché dans le titre du formulaire, pour vérifier qu'on a cliqué sur la bonne personne
 	const displayName = (member) => member?.nick || member?.user?.global_name || member?.user?.username
 
-	const openForm = (requesterId, userId, member, build, verb) => {
+	const openForm = (requesterId, userId, member, { build, verb, expected }) => {
 		if (isProtected(userId)) {
 			return { status: 200, message: `**Action prohibée** : <@${requesterId}> a tenté ${verb} <@${userId}>` }
 		}
+
+		// On refuse tout de suite plutôt qu'après avoir rempli le formulaire
+		const refusal = checkStage(expected, getStage(member?.roles, roles), userId)
+		if (refusal) return { status: 200, message: refusal }
+
 		return { form: build(userId, { displayName: displayName(member), ...findRankDefaults(member, roles) }) }
 	}
 
 	// `member` vient des données de l'interaction (rôles et pseudo du membre ciblé) : pas d'appel à Discord
 	const openEnrolForm = (requesterId, userId, member) =>
-		openForm(requesterId, userId, member, buildEnrolForm, "d'enrôler")
+		openForm(requesterId, userId, member, { build: buildEnrolForm, verb: "d'enrôler", expected: STAGE.CIVIL })
 
 	const openCadetForm = (requesterId, userId, member) =>
-		openForm(requesterId, userId, member, buildCadetForm, 'de recruter')
+		openForm(requesterId, userId, member, { build: buildCadetForm, verb: 'de recruter', expected: STAGE.RECRUE })
+
+	// À l'envoi du formulaire, on relit les rôles du membre sur Discord : il a pu changer depuis l'ouverture.
+	// Renvoie le message qui explique pourquoi on s'arrête, ou null si le membre est au bon stade.
+	const checkMemberStage = async (requesterId, userId, expected) => {
+		let member
+		try {
+			member = await discord.getMember(userId)
+		} catch (err) {
+			logger.error('Membre introuvable', { requesterId, userId, error: err })
+			return `Impossible de vérifier les rôles de <@${userId}> : rien n'a été modifié.`
+		}
+		return checkStage(expected, getStage(member.roles, roles), userId)
+	}
 
 	// Enrôler : la recrue a les rôles Discord d'un cadet (avec le grade de recrue), mais pas encore de compte forum
 	const enrolRecruit = async (requesterId, [commando, nom, troop, bordee]) => {
@@ -59,6 +80,9 @@ export function createRecruitmentFeature({ discord, forum, config, logger }) {
 		nom = String(nom ?? '').trim()
 		const invalid = checkRankInput(nom, troop, bordee, GRADE.RECRUE)
 		if (invalid) return { status: 200, message: invalid }
+
+		const refusal = await checkMemberStage(requesterId, commando, STAGE.CIVIL)
+		if (refusal) return { status: 200, message: refusal }
 
 		const nick = buildNick(GRADE.RECRUE, nom, troop)
 
@@ -85,6 +109,9 @@ export function createRecruitmentFeature({ discord, forum, config, logger }) {
 		nom = String(nom ?? '').trim()
 		const invalid = checkRankInput(nom, troop, bordee, GRADE.CADET)
 		if (invalid) return { status: 200, message: invalid }
+
+		const refusal = await checkMemberStage(requesterId, commando, STAGE.RECRUE)
+		if (refusal) return { status: 200, message: refusal }
 
 		const nick = buildNick(GRADE.CADET, nom, troop)
 		const [discordRoles, forumRoles] = getInitialRoles(troop, bordee, { roles, forumGroups })
